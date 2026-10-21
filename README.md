@@ -59,7 +59,7 @@ OpeningChessAI **habla y escucha**. No es un extra, es una forma completa de usa
 
 ## 🎬 Demo
 
-<!-- DEMO -->
+https://github.com/user-attachments/assets/d1347f30-8ae1-483b-b8ce-789cd3aa2e48
 
 <p align="center"><a href="https://app.openingchessai.com"><b>app.openingchessai.com</b></a> · acceso con aprobación manual</p>
 
