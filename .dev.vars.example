@@ -1,0 +1,10 @@
+# Copia este fichero a .dev.vars (ignorado por git) para `wrangler dev`.
+# En produccion se definen con: npx wrangler secret put <NOMBRE>
+# Solo nombres: NUNCA pongas valores reales en este fichero.
+SESSION_SECRET=
+RESEND_KEY=
+LICHESS_CLIENT_ID=
+LICHESS_EXPLORER_TOKEN=
+# Lista separada por comas de usuarios de Lichess y/o correos, p. ej.:
+# ADMIN=tu_usuario_lichess,tu@correo.com
+ADMIN=

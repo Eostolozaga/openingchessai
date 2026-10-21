@@ -1,0 +1,27 @@
+node_modules/
+.wrangler/
+.dev.vars
+dist/
+*.log
+shards/
+
+# --- Cosas que NUNCA pueden acabar en el repositorio ---------------------
+# El repositorio puede hacerse publico cualquier dia. Una clave subida a
+# GitHub esta comprometida aunque se borre en el commit siguiente: queda en
+# el historial y los rastreadores la leen en minutos.
+*.txt
+*.key
+*.pem
+.env
+.env.*
+
+# Los zips de entrega: son copias de lo que ya esta en el repo.
+*.zip
+
+# Ruido de Python al importar herramientas/bloques.py
+__pycache__/
+*.pyc
+
+# Cuarto trastero: lo que se saca de en medio pero no se puede borrar
+# desde aqui. Se borra a mano.
+_to_delete/
