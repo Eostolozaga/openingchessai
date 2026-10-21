@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1618">
+<meta name="robots" content="noindex">
+<title>OpeningChessAI — estado del despliegue</title>
+<link rel="stylesheet" href="/app.css">
+<style>
+  body { padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+         display: flex; flex-direction: column; gap: 18px; max-width: 640px; margin: 0 auto; }
+  .f { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .f:first-of-type { border-top: 0; }
+  .f .n { flex: 1; font-size: 14px; }
+  .banner { border-radius: var(--r); padding: 15px; font-weight: 600; text-align: center; }
+  .b-ok  { background: #14261a; color: #9fe0ae; }
+  .b-mal { background: #2a1614; color: #ffb3ac; }
+  .b-esp { background: var(--ink2); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="marca">
+  <img class="logo" src="/icons/logo.png" alt="" width="56" height="56">
+  <div>
+    <h1><span class="wm">OpeningChessAI</span></h1>
+    <p>Diagnóstico del despliegue</p>
+  </div>
+</div>
+
+<div id="banner" class="banner b-esp">Comprobando…</div>
+
+<div class="tarjeta"><h3>Bindings</h3><div id="bindings"></div></div>
+<div class="tarjeta"><h3>Secretos</h3><div id="secretos"></div></div>
+<div class="tarjeta"><h3>Base de datos D1</h3><div id="d1"></div></div>
+
+<a class="btn btn-sutil" href="/">Volver a la app</a>
+
+<p class="legal">
+  Esta página es interna: no lleva datos de ningún usuario, solo dice qué está
+  configurado y qué no.
+</p>
+
+<script>
+const ETIQUETAS = {
+  DB: 'D1 (base de datos)', ART: 'R2 artefactos', PGN: 'R2 PGN privados',
+  ASSETS: 'Ficheros estáticos', SESSION_SECRET: 'SESSION_SECRET',
+  RESEND_KEY: 'RESEND_KEY (correo)', LICHESS_CLIENT_ID: 'LICHESS_CLIENT_ID',
+};
+// Que falte uno de estos no rompe el despliegue, solo desactiva su via de acceso.
+const OPCIONALES = new Set(['RESEND_KEY']);
+
+const fila = (n, clase, txt) =>
+  `<div class="f"><span class="n">${n}</span><span class="etiqueta ${clase}">${txt}</span></div>`;
+
+function pintar(id, obj) {
+  document.getElementById(id).innerHTML = Object.entries(obj).map(([k, v]) => {
+    const n = ETIQUETAS[k] || k;
+    if (v) return fila(n, 'ok', 'OK');
+    return OPCIONALES.has(k) ? fila(n, '', 'pendiente') : fila(n, 'brass', 'FALTA');
+  }).join('');
+}
+
+(async () => {
+  const banner = document.getElementById('banner');
+  try {
+    const d = await (await fetch('/api/health', { cache: 'no-store' })).json();
+    pintar('bindings', d.bindings || {});
+    pintar('secretos', d.secretos || {});
+    document.getElementById('d1').innerHTML = d.d1?.conecta
+      ? fila('Conexión', 'ok', 'OK') + fila('Tablas', d.d1.tablas > 0 ? 'ok' : 'brass', String(d.d1.tablas))
+      : fila('Conexión', 'brass', 'FALLA') +
+        `<div class="f"><span class="n mono">${d.d1?.error || 'sin detalle'}</span></div>`;
+
+    const listo = d.ok && d.d1?.tablas > 0 && d.secretos?.SESSION_SECRET
+                  && d.secretos?.LICHESS_CLIENT_ID;
+    banner.className = 'banner ' + (listo ? 'b-ok' : 'b-mal');
+    banner.textContent = listo ? 'Todo lo necesario está configurado'
+                               : 'El Worker responde, pero falta configuración';
+  } catch (e) {
+    banner.className = 'banner b-mal';
+    banner.textContent = 'La API no responde: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>

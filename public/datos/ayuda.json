@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "temas": [
+
+    { "id": "inicio", "t": "Qué hay en Inicio", "tab": "inicio",
+      "c": ["inicio", "portada", "principal", "cifras", "resumen", "primera pantalla"],
+      "r": "Inicio es el resumen del día: tres cifras arriba (cursos que tienes, aperturas del repertorio y posiciones por repasar), la ficha FIDE cuando falta o conviene matizarla, la sugerencia del día y el interruptor de cesión de partidas.",
+      "acc": [{ "tipo": "ir", "tab": "inicio", "txt": "Ir a Inicio" }] },
+
+    { "id": "sugerencia", "t": "La sugerencia del día", "tab": "inicio",
+      "c": ["sugerencia", "novedad", "sorpresa", "hueco", "del dia", "diaria", "recomendacion"],
+      "r": "Cada día alterna entre dos cosas: un hueco (una posición de tu repertorio donde la élite juega algo que tú no tienes) y una sorpresa (una jugada poco frecuente que te puede servir de arma). Se calcula en tu móvil, no en el servidor, y guarda las últimas mostradas para no repetirse.",
+      "acc": [{ "tipo": "ir", "tab": "inicio", "txt": "Ir a Inicio" }] },
+
+    { "id": "fide", "t": "Tu ficha FIDE", "tab": "inicio",
+      "c": ["fide", "ficha", "elo", "id fide", "numero de ficha", "federacion"],
+      "r": "Sirve para dos cosas: encontrar tus propias partidas de torneo dentro de la base común y, si la cede Lichess, respaldar que esas partidas son tuyas. Un ID confirmado por Lichess vale más que uno tecleado a mano: el primero lo respalda un tercero.",
+      "acc": [{ "tipo": "ir", "tab": "inicio", "txt": "Ir a Inicio" }] },
+
+    { "id": "cesion", "t": "Ceder mis partidas", "tab": "inicio",
+      "c": ["ceder", "cesion", "compartir partidas", "base comun", "privacidad partidas"],
+      "r": "Es voluntario y reversible. Si lo activas, tus partidas de torneo entran en la base común que usa la app para preparar rivales. Puedes desactivarlo cuando quieras, y al borrar la cuenta se borran también.",
+      "acc": [{ "tipo": "ir", "tab": "inicio", "txt": "Ir a Inicio" }] },
+
+    { "id": "curso-subir", "t": "Subir un PGN a Cursos", "tab": "cursos",
+      "c": ["subir", "pgn", "importar", "curso", "fichero", "archivo", "cargar", "meter preparacion"],
+      "r": "En Cursos, elige el fichero .pgn, dile de qué color es y pulsa Subir. Se guarda privado: solo lo ves tú. Si el selector de ficheros de Android te enseña los PGN en gris, es cosa del móvil: entra por «Archivos» o por «Descargas» en vez de por la galería.",
+      "acc": [{ "tipo": "ir", "tab": "cursos", "txt": "Ir a Cursos" }] },
+
+    { "id": "curso-variantes", "t": "¿Se conservan las variantes del PGN?", "tab": "cursos",
+      "c": ["variantes", "subvariantes", "parentesis", "comentarios", "arbol", "parser"],
+      "r": "Sí. El PGN se lee con un parser propio precisamente para eso: las librerías habituales descartan las variantes entre paréntesis, que en un curso de aperturas son justo lo importante. Las partidas del mismo fichero que empiezan igual se fusionan y se cuenta por dónde pasan más, y esa frecuencia es la que luego usa el entrenador.",
+      "acc": [{ "tipo": "ir", "tab": "cursos", "txt": "Ir a Cursos" }] },
+
+    { "id": "curso-ver", "t": "Ver un curso en el tablero", "tab": "cursos",
+      "c": ["ver curso", "visor", "abrir curso", "tablero", "recorrer", "lineas del curso"],
+      "r": "Pulsa el curso en la lista de Cursos y se abre el visor: tablero, árbol de variantes y el nombre de la apertura de cada posición. Desde ahí puedes saltar al explorador de maestros para ver qué se juega de verdad en esa posición.",
+      "acc": [{ "tipo": "ir", "tab": "cursos", "txt": "Ir a Cursos" }] },
+
+    { "id": "curso-no-entrena", "t": "Mi curso no aparece en Entrenar", "tab": "rep",
+      "c": ["no aparece", "no sale", "falta curso", "entrenar vacio", "marcar curso", "no puedo entrenar"],
+      "r": "Un curso subido todavía no es repertorio. Ve a Repertorio y márcalo en «Cursos en tu repertorio»: solo lo marcado se entrena y se cruza contra un rival. Si lo has marcado y sigue sin salir, es que su árbol aún no se ha construido en este móvil: ábrelo una vez desde Cursos.",
+      "acc": [{ "tipo": "ir", "tab": "rep", "txt": "Ir a Repertorio" }] },
+
+    { "id": "rep-que-es", "t": "Qué es el Repertorio", "tab": "rep",
+      "c": ["repertorio", "que juego", "mi repertorio", "marcar", "eco"],
+      "r": "Lo que juegas de verdad: los cursos que marques más las líneas que añadas a mano. No son códigos ECO sueltos, son árboles: por eso el entrenador sabe qué contestar y el análisis de un rival sabe dónde se te sale del libro.",
+      "acc": [{ "tipo": "ir", "tab": "rep", "txt": "Ir a Repertorio" }] },
+
+    { "id": "rep-linea", "t": "Añadir una línea a mano", "tab": "rep",
+      "c": ["linea propia", "anadir linea", "editor", "meter jugadas", "sin pgn", "a mano"],
+      "r": "En Repertorio, «Añadir línea»: se abre un tablero donde metes las jugadas, eliges color y le pones nombre. Es la vía cuando no tienes un PGN, por ejemplo para una sorpresa que has preparado para una ronda concreta.",
+      "acc": [{ "tipo": "ir", "tab": "rep", "txt": "Ir a Repertorio" }] },
+
+    { "id": "rep-elite", "t": "Partidas de élite de tu repertorio", "tab": "rep",
+      "c": ["elite", "maestros", "partidas modelo", "2500", "gran maestro", "partidas de mi repertorio"],
+      "r": "Busca partidas de jugadores fuertes que pasan por tus líneas, separadas por color, y te deja descargarlas en PGN. Sirve para estudiar tus propias posiciones con partidas de verdad en vez de con análisis a secas.",
+      "acc": [{ "tipo": "ir", "tab": "rep", "txt": "Ir a Repertorio" }] },
+
+    { "id": "rep-mis-partidas", "t": "Sacar el repertorio de mis partidas", "tab": "rep",
+      "c": ["mis partidas", "que juego yo", "otb", "torneo", "sacarlo de mis partidas", "deducir repertorio"],
+      "r": "Con tu ficha FIDE puesta, «Ver qué juego» pliega tus partidas de torneo en líneas y te enseña lo que juegas de verdad, que no siempre es lo que crees. Lo que te convenza, se guarda como línea del repertorio.",
+      "acc": [{ "tipo": "ir", "tab": "rep", "txt": "Ir a Repertorio" }] },
+
+    { "id": "rival-lichess", "t": "Analizar un rival de Lichess", "tab": "rival",
+      "c": ["rival", "lichess", "contrario", "analizar", "preparar rival", "usuario"],
+      "r": "En Rival, pestaña Lichess: escribe su usuario, cuántas partidas quieres y a qué ritmo, y pulsa Analizar. Las partidas se bajan desde tu propio móvil, así que el límite de Lichess es el tuyo y no el de la app.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "rival-fide", "t": "Buscar un rival por FIDE", "tab": "rival",
+      "c": ["fide rival", "buscar por nombre", "numero de ficha", "otb rival", "torneo rival"],
+      "r": "En Rival, pestaña FIDE: por nombre —apellido primero, como en la ficha— o por número de ficha, que es mejor porque no hay dos iguales. Salen sus partidas de tablero, que es lo que te vas a encontrar en la ronda.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "rival-vistas", "t": "«Qué juega» y «Contra tu repertorio»", "tab": "rival",
+      "c": ["que juega", "contra tu repertorio", "vistas", "pestanas del rival", "dos vistas"],
+      "r": "«Qué juega» es su repertorio entero, agrupado por bloques de apertura. «Contra tu repertorio» es lo útil el día antes: solo las posiciones en las que os vais a encontrar, marcando dónde se sale de tu teoría.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "rival-espejo", "t": "El cruce en espejo", "tab": "rival",
+      "c": ["espejo", "cruce", "como funciona el analisis", "hueco", "se sale del libro", "teoria"],
+      "r": "No se reproducen sus partidas contra tu árbol: en sus partidas quien lleva tu color es otro, se sale de tu libro a la tercera jugada y el resto se pierde. Lo que se hace es indexar sus partidas por posición, solo donde movía él, y recorrer TU repertorio. Donde le toca mover, ya ha estado antes y jugó algo que tú no tienes cubierto, ahí hay un hueco real.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "rival-libro", "t": "El libro del rival", "tab": "rival",
+      "c": ["libro del rival", "sus partidas", "frecuencias", "arbol del rival"],
+      "r": "Un árbol navegable con todo lo que le has bajado: en cada posición, qué jugó, cuántas veces y con qué resultado, y las partidas concretas debajo. Se abre desde cualquier bloque del análisis.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "eval", "t": "Evaluación en la nube", "tab": null,
+      "c": ["eval", "evaluacion", "nube", "chessdb", "motor", "stockfish", "quien esta mejor"],
+      "r": "El botón «Evaluación en la nube» consulta chessdb: una base pública de posiciones ya analizadas. No es un motor corriendo en tu móvil, es una consulta. Ojo con el signo: la puntuación va desde el punto de vista de quien mueve, así que en una posición del rival un +0,80 verde es bueno para él.",
+      "acc": [] },
+
+    { "id": "bloques", "t": "Los bloques de apertura", "tab": null,
+      "c": ["bloques", "familias", "eco", "clasificacion", "agrupar"],
+      "r": "Los ECO sueltos no sirven para preparar: B90 y B96 son las dos Najdorf. Por eso se agrupan por familia —Siciliana, Francesa, Española, Nimzoindia, India de rey…—, que es la unidad con la que se piensa una partida antes de jugarla.",
+      "acc": [] },
+
+    { "id": "fichas-que-son", "t": "Qué son las Fichas", "tab": "fichas",
+      "c": ["fichas", "flashcards", "falladas", "repaso", "fen", "posiciones falladas"],
+      "r": "Las posiciones que has fallado entrenando, guardadas para volver a ellas. Se agrupan por el archivo del que salen y se repasan con repetición espaciada: cada acierto las aleja en el tiempo, cada fallo las acerca.",
+      "acc": [{ "tipo": "ir", "tab": "fichas", "txt": "Ir a Fichas" }] },
+
+    { "id": "fichas-filtros", "t": "Filtrar y elegir qué repasar", "tab": "fichas",
+      "c": ["filtros", "filtrar", "buscar fichas", "orden", "que repasar", "estado", "sin estrenar"],
+      "r": "Arriba puedes buscar por jugada, apertura, archivo o FEN, y cortar por color, apertura, veces fallada, estado y archivo. «Tocan hoy» son las que vencen, «Sin estrenar» las que nunca has repasado y «Ya sabidas» las que van bien. Cuando tengas los filtros como quieras, pulsa Repasar.",
+      "acc": [{ "tipo": "ir", "tab": "fichas", "txt": "Ir a Fichas" }] },
+
+    { "id": "entrenar-rep", "t": "Entrenar el repertorio", "tab": "train",
+      "c": ["entrenar", "entrenador", "practicar", "repasar repertorio", "jugar la linea"],
+      "r": "Elige qué entrenar, con qué color y cómo contesta el rival, y pulsa «Entrenar repertorio». La línea se juega desde el principio y tú vas metiendo tus jugadas. Al fallar te enseña la buena y sigue: no se repite dentro de la misma sesión, se guarda como ficha para otro día.",
+      "acc": [{ "tipo": "ir", "tab": "train", "txt": "Ir a Entrenar" }] },
+
+    { "id": "entrenar-ciegas", "t": "Blind: ajedrez a ciegas", "tab": "blind",
+      "c": ["ciegas", "a ciegas", "blind", "sin tablero", "de memoria", "blindfold", "visualizar", "congelado", "sin piezas", "coordenadas", "easy", "hard"],
+      "r": "La pestaña Blind tiene dos entrenamientos. Fichas de tus partidas: la partida arranca unas jugadas antes de tu fallo, las que faltan pasan sin tablero, encuentras la buena y, si aciertas, Stockfish contesta y sigues tres jugadas más de memoria. Tus cursos: la línea se juega a la vista hasta la jugada que elijas y desde ahí de memoria. En Easy ves el tablero antes y luego se queda quieto; en Hard no hay tablero y la posición va escrita en coordenadas. «Pista» dice qué pieza se mueve y desde dónde (ya no cuenta como acierto); «Ver» destapa el tablero tres segundos.",
+      "acc": [{ "tipo": "ir", "tab": "blind", "txt": "Ir a Blind" }] },
+
+    { "id": "blind-voz", "t": "Blind con voz (manos libres)", "tab": "blind",
+      "c": ["voz", "audio", "hablar", "manos libres", "andando", "auriculares", "dictar", "micro", "microfono", "escuchar"],
+      "r": "Marca «Con voz» en Blind: la app te dice las jugadas y dónde están las piezas, y tú contestas hablando («caballo efe tres», «e toma en de cinco», «enroque corto»). Órdenes: «repite», «línea» (todas las jugadas), «piezas» (dónde está cada una), «pista», «siguiente» y «para». La pantalla no se apaga mientras tanto; el candado de arriba ignora los toques del bolsillo y se quita manteniendo el dedo un segundo.",
+      "acc": [{ "tipo": "ir", "tab": "blind", "txt": "Ir a Blind" }] },
+
+    { "id": "entrenar-frec", "t": "Por frecuencia o al azar", "tab": "train",
+      "c": ["frecuencia", "al azar", "aleatorio", "respuestas", "como contesta"],
+      "r": "Por frecuencia, el rival contesta lo que más se repite en tu curso: entrenas más lo que más te vas a encontrar. Al azar reparte por igual, que va bien cuando ya te sabes la principal y quieres cubrir los laterales.",
+      "acc": [{ "tipo": "ir", "tab": "train", "txt": "Ir a Entrenar" }] },
+
+    { "id": "entrenar-cola", "t": "Entrenar sin cobertura", "tab": "train",
+      "c": ["sin conexion", "offline", "sin red", "avion", "cola", "no se guarda", "sala de torneo"],
+      "r": "Puedes entrenar sin red: los repasos se van encolando en el móvil y se suben solos cuando vuelve la conexión. Si ves el aviso de «sin conexión», estás viendo lo último que se guardó, no un fallo.",
+      "acc": [{ "tipo": "ir", "tab": "train", "txt": "Ir a Entrenar" }] },
+
+    { "id": "asistente-chat", "t": "Preguntar al asistente por un rival", "tab": null,
+      "c": ["asistente", "chat", "preguntar", "conversar", "bot", "que juega", "inteligencia artificial", "ia"],
+      "r": "Escribe la pregunta y envíala con Intro: «Juego de negras contra 1503014, ¿qué juega de blancas?», y luego sigue: «contra e4 juego e6, ¿cuál es la que más juega?», «dentro de su Francesa, contra la Tarrasch, ¿qué juega?», «¿y después?». Al rival lo puedes nombrar por su ficha FIDE, su nombre («apellido apellido, nombre»; si hay varios te pregunta cuál) o su usuario de Lichess o Chess.com. Un modelo pequeño entiende la pregunta y la app la contesta con las partidas de verdad del rival: los porcentajes no los escribe el modelo, se cuentan. Sin conexión entiende las frases habituales con reglas. Desde la respuesta puedes abrir al rival en Rival, en esa misma línea.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "por-nombre", "t": "Partidas «por nombre»", "tab": "rival",
+      "c": ["por nombre", "probable", "probables", "sin ficha", "sin id", "no es suya", "atribuida"],
+      "r": "Algunas partidas de la base llegan sin el número de ficha FIDE de un jugador, sobre todo retransmisiones y torneos con planillas digitales. Se le atribuyen por nombre solo si el nombre es idéntico, no hay otra ficha igual en todo el censo y el Elo encaja. Salen marcadas «por nombre» en la lista de partidas y sumadas aparte en la ficha («400 partidas · +43 por nombre»). Son muy probablemente suyas, no seguro.",
+      "acc": [{ "tipo": "ir", "tab": "rival", "txt": "Ir a Rival" }] },
+
+    { "id": "explorador", "t": "El explorador de maestros", "tab": null,
+      "c": ["explorador", "maestros", "base de datos", "estadisticas", "que se juega", "masters"],
+      "r": "La base de partidas de maestros de Lichess, navegable desde cualquier posición: qué se juega ahí, con qué frecuencia y con qué resultado, y partidas modelo para abrir. Se llega desde el visor de un curso, desde la sugerencia del día y desde el análisis de un rival.",
+      "acc": [{ "tipo": "exp", "txt": "Abrir el explorador" }] },
+
+    { "id": "instalar", "t": "Instalar la app en el móvil", "tab": null,
+      "c": ["instalar", "pwa", "icono", "pantalla de inicio", "app nativa", "descargar"],
+      "r": "No hay que pasar por ninguna tienda: es una PWA. En Chrome de Android, menú del navegador y «Añadir a pantalla de inicio»; en iPhone, el botón de compartir de Safari y «Añadir a pantalla de inicio». Instalada abre a pantalla completa y con accesos directos a Rival y a Entrenar.",
+      "acc": [] },
+
+    { "id": "offline", "t": "Usar la app sin conexión", "tab": null,
+      "c": ["offline", "sin internet", "sin datos", "sin cobertura", "avion", "modo avion"],
+      "r": "El repertorio y los árboles de los cursos se guardan en el móvil, así que puedes repasar en el metro o en una sala con la cobertura saturada. Lo que sí necesita red es bajar partidas de un rival, el explorador de maestros y la evaluación en la nube.",
+      "acc": [] },
+
+    { "id": "tema", "t": "Modo día y modo noche", "tab": null,
+      "c": ["tema", "modo dia", "modo noche", "oscuro", "claro", "colores", "brillo"],
+      "r": "El botón del sol en la barra de arriba cambia entre modo día y modo noche, y se recuerda.",
+      "acc": [] },
+
+    { "id": "cuenta", "t": "Cuenta, acceso y salir", "tab": null,
+      "c": ["cuenta", "salir", "cerrar sesion", "entrar", "acceso", "login", "pendiente", "aprobar"],
+      "r": "Se entra con Lichess o con un enlace por correo. La app es cerrada: las cuentas nuevas nacen pendientes y no ven nada hasta que alguien las aprueba a mano. «Salir» está en la barra de arriba.",
+      "acc": [] },
+
+    { "id": "privacidad", "t": "Privacidad y aviso legal", "tab": null,
+      "c": ["privacidad", "legal", "datos", "borrar cuenta", "aviso", "condiciones", "rgpd"],
+      "r": "Tus cursos son privados y solo los ves tú. Ceder partidas es voluntario y reversible, y al borrar la cuenta se borran. El detalle está en el aviso de uso y privacidad.",
+      "acc": [{ "tipo": "enlace", "url": "/legal.html", "txt": "Ver el aviso legal" }] }
+
+  ]
+}

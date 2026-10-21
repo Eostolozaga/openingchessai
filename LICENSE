@@ -1,0 +1,47 @@
+Copyright (c) 2026 Eneko Ostolozaga.
+Todos los derechos reservados / All rights reserved.
+
+---------------------------------------------------------------------------
+ESPAÑOL
+
+El código fuente de OpeningChessAI se publica únicamente para su consulta
+como portfolio. No se concede ningún permiso para copiar, modificar,
+distribuir, sublicenciar, alojar o utilizar el código, el diseño, los textos
+o los datos, en todo o en parte, ni para crear obras derivadas o servicios
+competidores, sin autorización previa y por escrito del autor.
+
+Ver el repositorio y hacer un fork dentro de GitHub solo se permite en la
+medida en que lo exigen los Términos de Servicio de GitHub; ese fork no
+concede ningún otro derecho de uso.
+
+---------------------------------------------------------------------------
+ENGLISH
+
+The OpeningChessAI source code is published solely for viewing as a
+portfolio. No permission is granted to copy, modify, distribute, sublicense,
+host or use the code, design, texts or data, in whole or in part, nor to
+create derivative works or competing services, without the author's prior
+written permission.
+
+Viewing and forking this repository on GitHub are permitted only to the
+extent required by GitHub's Terms of Service; such a fork grants no further
+right of use.
+
+---------------------------------------------------------------------------
+Componentes de terceros / Third-party components
+
+The following third-party components are included under their own licences
+and are EXCLUDED from the notice above:
+
+  - public/vendor/stockfish/  Stockfish.js 19 lite (GPLv3)
+                              -> public/vendor/stockfish/COPYING
+  - public/vendor/chess.js    chess.js 1.4.0 (BSD-2-Clause)
+                              -> public/vendor/chess.js.LICENSE
+  - public/datos/aperturas*.json  opening names and ECO codes derived from
+                              lichess-org/chess-openings (CC0)
+                              -> public/datos/aperturas.LICENSE
+  - Piece set "cburnett" by Colin M. L. Burnett (GPLv2+ / BSD / GFDL)
+
+Los componentes de terceros conservan sus propias licencias y quedan
+excluidos de este aviso. El logo y los iconos de OpeningChessAI
+(public/icons/) tampoco se pueden reutilizar ni redistribuir.

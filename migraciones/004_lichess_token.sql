@@ -1,0 +1,25 @@
+-- ============================================================================
+-- 004 — guardar el token de Lichess
+--   wrangler d1 execute xaketegi --file=migraciones/004_lichess_token.sql --remote
+--
+-- El 3 de marzo de 2026 Lichess cerro el explorador de aperturas a las
+-- peticiones anonimas: `explorer.lichess.org/masters` responde 401 a quien no
+-- se identifica. El motivo que dio thibault es que el explorador es de lo mas
+-- caro de servir que tienen y lo estaban usando como vector de ataque.
+--
+-- La app lo llamaba DIRECTAMENTE desde el navegador, a proposito: el limite de
+-- peticiones era por IP y asi cada usuario gastaba su propia cuota. Con el
+-- cierre esa razon desaparece —ahora el limite va por token— y la llamada pasa
+-- al Worker, que ademas puede cachear en el edge. El token tiene que estar en
+-- el servidor para eso, y de paso no viaja nunca al navegador.
+--
+-- Que se guarda exactamente: el `access_token` que devuelve el intercambio
+-- OAuth, con el unico alcance que la app pide (`email:read`). No es una
+-- contrasena y no da acceso a jugar ni a escribir nada en la cuenta. Se borra
+-- solo al borrar la cuenta, porque esta en la misma fila.
+--
+-- D1 no tiene "ADD COLUMN IF NOT EXISTS": si esta migracion ya se aplico, el
+-- ALTER fallara con "duplicate column name" y no pasa nada.
+-- ============================================================================
+
+ALTER TABLE users ADD COLUMN lichess_token TEXT;

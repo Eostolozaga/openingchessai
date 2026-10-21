@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1618">
+<meta name="description" content="Qué se guarda, dónde, quién puede verlo y qué se puede hacer con la app.">
+<title>Aviso de uso y privacidad · OpeningChessAI</title>
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="/app.css">
+<script>
+  /* Respetar el modo día/noche elegido en la app. Va suelto y no importando
+     app.js a proposito: app.js arranca la aplicacion entera —pide la sesion,
+     engancha formularios que aqui no existen— y esto es una pagina de texto.
+     Tres lineas duplicadas son mejor que cargar la app para leer un aviso.
+     Y va en el <head>, antes de pintar: puesto abajo se veria el destello del
+     tema contrario. */
+  try {
+    var t = localStorage.getItem('tema');
+    if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.tema = t;
+  } catch (e) { /* modo privado */ }
+</script>
+<style>
+  /* Una pagina de texto, no una pantalla de app: una columna estrecha, tipografia
+     algo mayor y aire entre parrafos. Es larga a proposito —decir lo que pasa con
+     los datos de alguien en tres lineas es no decirlo— y por eso tiene que
+     leerse comoda. */
+  .doc { max-width: 640px; margin: 0 auto; padding: 24px 20px 60px; }
+  .doc h1 { font-size: 26px; letter-spacing: -.02em; margin: 18px 0 4px; }
+  .doc h2 { font-size: 17px; margin: 34px 0 10px; color: var(--brass); }
+  .doc h3 { font-size: 15px; margin: 20px 0 6px; }
+  .doc p, .doc li { font-size: 15px; line-height: 1.75; }
+  .doc ul { padding-left: 20px; margin: 8px 0; }
+  .doc li { margin: 4px 0; }
+  .doc a { color: var(--azul); }
+  .fecha { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  .caja { border: 1px solid var(--line); border-radius: var(--r);
+          background: var(--ink2); padding: 14px 16px; margin: 18px 0; }
+  .caja p:first-child { margin-top: 0; }
+  .caja p:last-child  { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div class="doc">
+  <p><a href="/">‹ Volver a la app</a></p>
+
+  <div class="marca" style="margin:22px 0 8px">
+    <img class="logo" src="/icons/logo.png" alt="" width="56" height="56">
+    <div>
+      <h1 style="margin:0;font-size:24px"><span class="wm">OpeningChessAI</span></h1>
+      <p style="margin:3px 0 0;font-size:13px;color:var(--muted)">Preparación de ajedrez en el móvil</p>
+    </div>
+  </div>
+
+  <h1>Aviso de uso y privacidad</h1>
+  <p class="fecha">Última revisión: octubre de 2026</p>
+
+  <p>
+    OpeningChessAI es una herramienta personal de preparación de ajedrez. La
+    hace y la mantiene una sola persona, no una empresa, y el acceso es
+    cerrado: entra únicamente quien recibe una aprobación manual.
+  </p>
+  <p>
+    Este texto está escrito para que se entienda, no para cubrirse. Si algo de
+    lo que dice no te parece bien, lo razonable es no usar la app.
+  </p>
+
+  <h2>1. Qué se guarda</h2>
+  <ul>
+    <li><b>Tu identidad mínima:</b> el correo con el que entras o tu usuario de
+      Lichess, y —si la tienes— tu ficha FIDE, tu nombre, tu país, tu título y
+      tu Elo. De Lichess llegan porque tú autorizas la conexión. Si lo
+      escribes, también tu usuario de Chess.com.</li>
+    <li><b>Tus PGN.</b> Los cursos y ficheros que subes.</li>
+    <li><b>Tu actividad de estudio:</b> qué has repasado y cuándo, para saber
+      qué te toca repasar mañana.</li>
+    <li><b>Tus partidas cedidas</b>, solo si activas esa casilla. Está apagada
+      por defecto.</li>
+    <li><b>Los fallos de la app</b>: cuando algo se rompe en tu móvil se
+      apunta el mensaje del error y en qué fichero ha pasado, <b>sin decir de
+      quién es</b>, para poder arreglarlo. Se guarda un mes como mucho.</li>
+  </ul>
+  <p>
+    No hay analítica, ni publicidad, ni rastreadores de terceros, ni perfilado.
+    No se vende ni se cede nada a nadie, y no existe ningún acuerdo por el que
+    pudiera hacerse.
+  </p>
+
+  <h2>2. Dónde está</h2>
+  <p>
+    Todo vive en la infraestructura de Cloudflare, en su red europea:
+  </p>
+  <ul>
+    <li>Los datos de tu cuenta y tu actividad, en una base de datos D1.</li>
+    <li>Tus PGN, en almacenamiento privado R2, en una carpeta propia por
+      usuario. No son públicos ni tienen ninguna dirección accesible desde
+      fuera: se sirven solo a tu sesión.</li>
+    <li>Los árboles ya procesados de tus cursos, <b>en tu propio móvil</b>, en
+      el almacenamiento del navegador. Eso es lo que permite entrenar sin
+      cobertura, y se borra al borrar los datos del sitio.</li>
+  </ul>
+  <p>
+    No hay ninguna copia en el ordenador de quien opera el servicio.
+  </p>
+
+  <h2>3. Quién puede ver tus PGN</h2>
+  <div class="caja">
+    <p>
+      Ningún otro usuario de la app puede ver tus ficheros. No hay ninguna
+      pantalla, ninguna función y ninguna dirección que enseñe los cursos de
+      otra persona.
+    </p>
+    <p>
+      Quien opera el servicio —es decir, el titular de la cuenta de
+      Cloudflare— <b>sí podría técnicamente abrirlos</b>, igual que el
+      administrador de cualquier servidor podría abrir lo que hay en él. No se
+      hace, y aquí queda el compromiso explícito de no hacerlo salvo que tú lo
+      pidas para resolver un problema concreto tuyo.
+    </p>
+    <p>
+      Se dice porque es la verdad. Cualquier servicio que te prometa que es
+      imposible, sin cifrado de extremo a extremo, te está contando otra cosa.
+    </p>
+  </div>
+
+  <h2>4. La base de partidas de rivales</h2>
+  <p>
+    La app cruza tu repertorio contra una base de partidas de torneo y de
+    partidas de élite. Esas partidas son resultados deportivos publicados: los
+    nombres, los Elo y las jugadas de una partida oficial son información
+    pública, y así se tratan.
+  </p>
+  <p>
+    Algunas partidas llegan sin el número de ficha FIDE de uno de los
+    jugadores. Esas se atribuyen por el nombre solo si es idéntico, no hay
+    otra ficha igual en todo el censo y el Elo encaja, y se ven marcadas
+    <b>«por nombre»</b>: son muy probablemente de esa persona, no seguro. Si
+    te atribuye una partida que no jugaste, dilo y se quita.
+  </p>
+  <p>
+    Si cedes tus partidas —la casilla del inicio— entran en esa base común
+    igual que las demás. Puedes desactivarlo cuando quieras, y al borrar la
+    cuenta se borran también las que hubieras cedido.
+  </p>
+
+  <h2>5. Correo</h2>
+  <p>
+    El correo se usa para una sola cosa: mandarte el enlace de acceso. No hay
+    boletín, ni avisos, ni nada que haga falta darse de baja. Los enlaces
+    caducan a los 15 minutos y sirven una sola vez.
+  </p>
+  <p>
+    El envío tiene un límite diario y mensual. Si se alcanza, la app lo dice y
+    te propone entrar con Lichess, que no tiene límite.
+  </p>
+
+  <h2>6. Acceso cerrado</h2>
+  <p>
+    Registrarse no da acceso. Las cuentas nuevas quedan en espera hasta que se
+    aprueban a mano, y la aprobación no caduca: una vez dentro, se sigue dentro
+    sin renovar nada.
+  </p>
+  <p>
+    El acceso puede retirarse. Si ocurre, tus datos <b>no se borran</b>:
+    simplemente dejas de entrar, y se puede deshacer.
+  </p>
+  <p>
+    Una cuenta es una persona. Si la misma persona entra un día por correo y
+    otro por Lichess, es la misma cuenta y ve el mismo material siempre que se
+    trate del mismo correo o de la misma ficha FIDE confirmada.
+  </p>
+
+  <h2>7. Tus derechos</h2>
+  <ul>
+    <li><b>Ver lo que hay:</b> tus cursos están en la pestaña Cursos y puedes
+      descargarlos cuando quieras. Son los mismos ficheros que subiste.</li>
+    <li><b>Borrar un curso:</b> el botón de la papelera. Se borra de verdad, del
+      almacenamiento y de la base.</li>
+    <li><b>Borrar la cuenta entera:</b> se borra todo —cuenta, PGN, actividad y
+      partidas cedidas—. No queda una copia «por si acaso».</li>
+    <li><b>Rectificar:</b> tu ficha FIDE la puedes cambiar desde Inicio.</li>
+  </ul>
+  <p>
+    Para cualquiera de estas cosas, o para preguntar qué se guarda exactamente
+    de ti, basta con escribir a quien te dio el acceso.
+  </p>
+
+  <h2>8. Lo que no es</h2>
+  <p>
+    Esto no es un producto comercial ni tiene detrás una empresa con soporte.
+    Puede fallar, puede estar caído y puede dejar de existir. <b>No lo uses como
+    único sitio donde guardas tus PGN</b>: guarda tú una copia de lo que te
+    importe.
+  </p>
+  <p>
+    No se garantiza que los análisis, las evaluaciones ni las estadísticas sean
+    correctos. Son una ayuda para preparar, no un oráculo.
+  </p>
+
+  <h2>9. Terceros</h2>
+  <ul>
+    <li><b>Cloudflare</b> — alojamiento, base de datos y almacenamiento.</li>
+    <li><b>Lichess</b> — acceso con tu cuenta, explorador de maestros y partidas
+      modelo. Solo se le pide lo mínimo y solo si tú autorizas la conexión.
+      Las partidas de un rival de Lichess se piden <b>directamente desde tu
+      móvil</b>, como si abrieras su perfil.</li>
+    <li><b>Chess.com</b> — las partidas públicas del usuario que buscas, también
+      pedidas desde tu móvil. No hace falta cuenta ni se le manda nada tuyo
+      aparte de lo que ve en cualquier visita.</li>
+    <li><b>chessdb.cn</b> — evaluación de posiciones. Se le manda la posición,
+      nunca quién la consulta.</li>
+    <li><b>Resend</b> — envío del correo con tu enlace de acceso.</li>
+    <li><b>Cloudflare Workers AI</b> — lo que <b>envías</b> al asistente se manda a
+      un modelo de lenguaje de Cloudflare, en la misma cuenta que aloja la app,
+      solo para entender la pregunta. No se guarda el texto: solo se cuenta
+      cuántos mensajes manda cada cuenta al día, para el cupo.</li>
+  </ul>
+
+  <h2>10. Cambios</h2>
+  <p>
+    Si esto cambia de forma que te afecte, se avisa dentro de la app. Los
+    cambios de redacción o de detalle se reflejan en la fecha de arriba.
+  </p>
+
+  <p style="margin-top:36px"><a href="/">‹ Volver a la app</a></p>
+</div>
+
+</body>
+</html>

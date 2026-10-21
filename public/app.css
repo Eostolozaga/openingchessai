@@ -1,0 +1,1719 @@
+/* ===========================================================================
+   OpeningChessAI — hoja de estilo unica.
+
+   No hay Tailwind ni ningun CDN. Tres razones, por orden de importancia:
+     1. Offline. Una PWA que necesita bajarse un framework para pintarse no
+        funciona en la sala de un torneo con la cobertura saturada.
+     2. Arranque. cdn.tailwindcss.com compila el CSS en el navegador en cada
+        carga: medio segundo de pantalla en blanco que se nota en un movil.
+     3. Tamano. Esto son ~7 KB. El equivalente en utilidades no compiladas son
+        cientos.
+   La paleta y las decisiones de fluidez vienen del prototipo, que estaban
+   bien pensadas; lo que cambia es de donde sale el CSS.
+   =========================================================================== */
+
+:root {
+  /* Paleta «Chess AI»: el azul marino del logo. Antes salia del
+     material del ajedrez de torneo —tinta de planilla y casillas verdes— y era
+     una buena paleta, pero de otra marca. Con el logo azul y dorado delante, el
+     verde tinta se leia como un despiste.
+     El rojo de la bandera del reloj analogico se queda: es el unico color que
+     todo el mundo lee como «se acabo el tiempo». */
+  --ink:     #0A0E1A;
+  --ink2:    #141B2E;
+  --ink3:    #1A2236;
+  --line:    #26314C;
+  --paper:   #E9EEF7;
+  --muted:   #8E9BB4;
+  --flag:    #EF4444;
+  --sqlight: #DDE5EE;
+  --sqdark:  #7F8BA1;
+
+  /* --- La marca -----------------------------------------------------------
+     Del logo: azul electrico y dorado. Es la misma dualidad que usa la web en
+     su wordmark, y es lo que hace que las dos se reconozcan como la misma cosa
+     sin tener que copiar el tema claro del escritorio, que en un movil dentro
+     de una sala de torneo seria un paso atras.
+
+     El azul manda —es el que lleva el peso de la interfaz: botones, iconos
+     activos, la casilla elegida— y el dorado es el remate: el aro del logo, la
+     chincheta, el final del degradado del nombre. Al reves cansaria: un
+     interfaz enteramente dorado sobre fondo oscuro se lee como una alerta
+     permanente. */
+  --azul:       #5B9DFF;
+  --azul-claro: #9DB8FF;
+  --oro:        #E0B84C;
+  --oro-fondo:  #33290F;
+  --marca-grad: linear-gradient(120deg, #5B9DFF 0%, #9DB8FF 45%, #E8C06A 100%);
+
+  /* --- El fondo ------------------------------------------------------------
+     Tres capas, las mismas que la web:
+       1. dos resplandores —azul arriba en medio, dorado arriba a la derecha—
+          que levantan la cabecera sin iluminar la pagina entera;
+       2. una rejilla finisima de 64 puntos, que da textura sin dibujar nada;
+       3. un damero de 120 puntos con el azul del logo y un matiz dorado, que se
+          desvanece en diagonal antes de llegar al contenido.
+     El damero desvanecido es el motivo: un damero de arriba abajo compite con
+     el tablero de verdad, que es lo unico que hay que mirar en esta app. */
+  --brillo-azul: rgba(59, 130, 246, .16);
+  --brillo-oro:  rgba(224, 184, 76, .05);
+  --rejilla:     rgba(255, 255, 255, .022);
+  --dam-azul:    rgba(59, 130, 246, .11);
+  --dam-oro:     rgba(232, 192, 106, .05);
+  --fondo-alto:  #0D1322;
+
+  /* `--brass` era el acento cuando la paleta salia del laton de un reloj
+     analogico. El nombre se queda porque lo usan cincuenta y tantos sitios y
+     renombrarlos no cambiaria un pixel; lo que cambia es a que apunta. */
+  --brass:   var(--azul);
+
+  /* Las dos maderas del tablero. Deliberadamente FUERA de la paleta verde de
+     la interfaz: el tablero no es un componente mas de la app, es el objeto
+     que se mira, y en un movil se agradece que sea el de siempre. */
+  --sq-clara:  #EDD7B4;
+  --sq-oscura: #B58863;
+
+  /* Colores con NOMBRE DE FUNCION, no de tono. Estaban escritos a pelo por
+     media hoja, y con dos temas eso son dos sitios que arreglar cada vez. */
+  --ok-borde:   #2c4a34;  --ok-fondo:   #14261a;  --ok-texto:   #9fe0ae;
+  --mal-borde:  #5b2b28;  --mal-fondo:  #2a1614;  --mal-texto:  #ffb3ac;
+  --pista-borde:#6b5320;  --pista-fondo:#2a2213;  --pista-texto:#f0d08a;
+  --brass-fondo:#16233D;   /* azul muy oscuro: el fondo de las etiquetas de acento */
+  --velo:       rgba(10,14,26,.74);
+  --marca:      rgba(20,26,22,.32);
+  --sombra-pieza: rgba(0,0,0,.28);
+  /* Tinta que NO cambia con el tema: la de encima de una casilla clara o de
+     una etiqueta que siempre es blanca. Sin esto, en modo dia `--ink` se
+     vuelve claro y esos textos desaparecen. */
+  --tinta-fija: #0A0E1A;
+
+  --r:   14px;   /* radio estandar */
+  --r-s: 10px;
+  --nav: 62px;   /* alto de la barra inferior */
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ink);
+  /* `background-attachment: fixed` seria lo corto de escribir y en un movil se
+     paga caro: obliga a repintar el fondo entero en cada fotograma del scroll.
+     Un pseudoelemento `position: fixed` no se mueve, asi que no se repinta. */
+  position: relative;
+  color: var(--paper);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Evita el rebote de la pagina entera al llegar al final de una lista:
+     en una PWA a pantalla completa ese rebote delata que es una web. */
+  overscroll-behavior-y: contain;
+}
+
+/* El fondo de la app. Va detras de todo (`z-index: -1`) y no recibe toques.
+   Las pantallas a pantalla completa —visor, tablero, entrenador— lo tapan con
+   su propio fondo opaco a proposito: ahi lo unico que hay que mirar es el
+   tablero, y un damero de adorno detras de un damero de verdad es ruido. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    /* El velo que apaga el damero segun se baja: transparente arriba a la
+       izquierda, fondo macizo a media pantalla. */
+    /* Tres paradas y no dos: con un corte de transparente a macizo en media
+       pantalla se ve la costura diagonal, y una costura fija en mitad del movil
+       se mira mas que el contenido. Asi el damero se apaga sin que se note por
+       donde. */
+    linear-gradient(165deg, transparent 0%,
+                    color-mix(in srgb, var(--ink) 45%, transparent) 22%,
+                    color-mix(in srgb, var(--ink) 88%, transparent) 48%,
+                    var(--ink) 72%),
+    radial-gradient(900px 480px at 50% -8%, var(--brillo-azul), transparent 70%),
+    radial-gradient(700px 500px at 90% 0%, var(--brillo-oro), transparent 70%),
+    repeating-conic-gradient(var(--dam-azul) 0% 25%, var(--dam-oro) 0% 50%),
+    repeating-linear-gradient(0deg,  var(--rejilla) 0 1px, transparent 1px 64px),
+    repeating-linear-gradient(90deg, var(--rejilla) 0 1px, transparent 1px 64px),
+    linear-gradient(180deg, var(--fondo-alto), var(--ink) 38%);
+  background-size: auto, auto, auto, 120px 120px, auto, auto, auto;
+}
+/* `color-mix` es de 2023 y esta en todo lo que importa, pero si faltara el velo
+   entero se cae y el damero quedaria a plena intensidad sobre el contenido. El
+   respaldo lo pone macizo, que es feo pero legible. */
+@supports not (color: color-mix(in srgb, red 50%, transparent)) {
+  body::before { background-image: linear-gradient(180deg, var(--fondo-alto), var(--ink) 38%); }
+}
+
+button, a, input, select, label { touch-action: manipulation; }
+button, input, select { font: inherit; color: inherit; }
+
+/* Objetivo tactil minimo. 44px es el umbral por debajo del cual la gente
+   falla el toque de forma medible, y aqui se usa la app de pie. */
+button, .btn, .nav-item { min-height: 44px; }
+
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+/* --- Utilidades minimas ------------------------------------------------- */
+.oculto { display: none !important; }
+.fila   { display: flex; align-items: center; gap: 10px; }
+.crece  { flex: 1; min-width: 0; }
+.recorta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===========================================================================
+   ACCESO
+   =========================================================================== */
+/* La sala de espera se compone igual que el acceso: es la misma clase de
+   pantalla —una sola cosa que decir, centrada— y compartirla evita que las dos
+   se separen visualmente con el tiempo. */
+#acceso, #espera {
+  min-height: 100dvh;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 22px;
+  padding: max(28px, env(safe-area-inset-top)) 22px max(28px, env(safe-area-inset-bottom));
+  max-width: 460px; margin: 0 auto;
+}
+
+.marca { display: flex; align-items: center; gap: 14px; }
+.marca h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+.marca p  { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+
+/* --- El logo -------------------------------------------------------------
+   Redondo y con aro dorado, igual que en la web. El aro no es decoracion: el
+   arte del logo se funde con el fondo oscuro por los bordes —es casi negro en
+   las esquinas— y sin un borde la imagen no termina en ninguna parte.
+
+   El resplandor azul de fuera es el mismo truco que usa la web, medido para
+   que se note y no deslumbre: un movil en una sala a oscuras con un halo
+   fuerte molesta de verdad. */
+.logo {
+  width: 56px; height: 56px; flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--oro);
+  box-shadow: 0 0 0 3px rgba(232, 192, 106, .12),
+              0 0 22px -4px rgba(91, 157, 255, .55);
+  background: var(--ink2);   /* mientras carga, y en el hueco si fallara */
+}
+/* En la barra de dentro va sin resplandor: ahi el logo es un punto de
+   referencia, no el protagonista, y un halo repetido en cada pantalla cansa. */
+.logo.mini {
+  width: 32px; height: 32px;
+  border-width: 1.5px;
+  box-shadow: 0 0 0 2px rgba(232, 192, 106, .10);
+}
+
+/* --- El wordmark ---------------------------------------------------------
+   El degradado azul -> dorado del logo, aplicado al texto. Es exactamente el
+   mismo que la web para que las dos digan el nombre igual.
+
+   El `color` de debajo NO es decorativo: si el navegador no soporta recortar
+   el fondo al texto, `transparent` dejaria el nombre invisible. Con esto,
+   en el peor caso se lee en azul liso. */
+.wm {
+  color: var(--azul);
+  background: var(--marca-grad);
+  -webkit-background-clip: text; background-clip: text;
+  font-weight: 800; letter-spacing: -.02em;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .wm { color: transparent; }
+}
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%; padding: 14px 16px;
+  border: 0; border-radius: var(--r);
+  background: var(--ink3); color: var(--paper);
+  font-weight: 600; cursor: pointer; text-decoration: none;
+  transition: background .15s, opacity .15s;
+}
+.btn:active { background: var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn-primario { background: var(--paper); color: var(--ink); }
+.btn-primario:active { background: #cfcdc4; }
+.btn-sutil { background: transparent; border: 1px solid var(--line); }
+.btn-peq { padding: 9px 13px; font-size: 14px; width: auto; }
+
+.separador {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+}
+.separador::before, .separador::after {
+  content: ""; flex: 1; height: 1px; background: var(--line);
+}
+
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-size: 12px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.campo input, .campo select {
+  padding: 13px 14px;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r-s);
+  outline: none;
+}
+.campo input:focus, .campo select:focus { border-color: var(--sqdark); }
+
+/* El boton nativo del input de fichero viene con los colores del sistema y
+   canta muchisimo sobre fondo oscuro. Es lo unico del formulario que no se
+   puede maquetar de otra forma sin esconder el input y perder accesibilidad. */
+.campo input[type="file"] { padding: 9px 10px; }
+.campo input[type="file"]::file-selector-button {
+  margin-right: 12px; padding: 8px 13px;
+  border: 0; border-radius: 8px;
+  background: var(--ink3); color: var(--paper);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.campo .pista { font-size: 12px; color: var(--muted); }
+
+.aviso {
+  padding: 13px 15px; border-radius: var(--r-s); font-size: 14px;
+  border: 1px solid var(--line); background: var(--ink2);
+}
+.aviso.mal   { border-color: var(--mal-borde); background: var(--mal-fondo); color: var(--mal-texto); }
+.aviso.bien  { border-color: var(--ok-borde); background: var(--ok-fondo); color: var(--ok-texto); }
+
+.legal { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+/* El azul por defecto del navegador desentona con toda la paleta y, en el tema
+   oscuro, casi no se lee sobre el fondo. */
+.legal a { color: var(--brass); }
+
+/* ===========================================================================
+   ESQUELETO DE LA APP
+   =========================================================================== */
+#app { display: flex; flex-direction: column; min-height: 100dvh; }
+
+header.barra {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 12px;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+  background: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+header.barra .quien { font-size: 13px; color: var(--muted); }
+header.barra .quien strong { color: var(--paper); font-weight: 600; }
+
+main {
+  flex: 1;
+  /* Los 64 de mas por debajo son el sitio de la burbuja del asistente: sin
+     ellos, al llegar al final de una lista larga el circulo se sienta encima
+     del ultimo elemento y tapa justo lo que se estaba mirando. */
+  padding: 16px 16px calc(var(--nav) + env(safe-area-inset-bottom) + 64px);
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+h2.titulo { margin: 4px 0 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+p.entradilla { margin: 0; color: var(--muted); font-size: 14px; }
+
+.tarjeta {
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 15px;
+  display: flex; flex-direction: column; gap: 11px;
+}
+.tarjeta h3 {
+  margin: 0; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+}
+.tarjeta.acento { border-color: var(--brass); }
+
+.cifras { display: flex; gap: 10px; }
+.cifra {
+  flex: 1; background: var(--ink2); border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 12px; text-align: center;
+}
+.cifra .n { font-size: 24px; font-weight: 700; line-height: 1.1; }
+.cifra .q { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 3px; }
+
+/* Listas largas: el navegador se salta el layout de lo que no se ve, asi una
+   lista de 400 aperturas no bloquea el hilo al hacer scroll. */
+.lista { display: flex; flex-direction: column; gap: 8px; }
+.item {
+  content-visibility: auto; contain-intrinsic-size: auto 64px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r-s);
+}
+.item .t { font-weight: 600; font-size: 15px; }
+.item .s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* Una fila que se ve pero no se pulsa: el jugador esta en el censo FIDE y no
+   tenemos ni una partida suya. Ni se atenua tanto que parezca rota ni se deja
+   igual que las demas, que invitaria a pulsarla. */
+.item.apagado { opacity: .72; }
+.item.apagado .t { font-weight: 500; }
+
+.etiqueta {
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px;
+  background: var(--ink3); color: var(--muted); white-space: nowrap;
+}
+.etiqueta.blancas { background: var(--sqlight); color: var(--tinta-fija); }
+.etiqueta.negras  { background: var(--sqdark);  color: var(--paper); }
+.etiqueta.ok      { background: var(--ok-fondo); color: var(--ok-texto); }
+.etiqueta.brass   { background: var(--brass-fondo); color: var(--brass); }
+
+.vacio {
+  padding: 26px 16px; text-align: center; color: var(--muted); font-size: 14px;
+  border: 1px dashed var(--line); border-radius: var(--r); line-height: 1.6;
+}
+
+/* Bloque en flujo normal, NO flex: dentro hay <b> en mitad de una frase, y en
+   un contenedor flex cada uno se convertiria en su propio renglon. */
+.pronto {
+  padding: 16px; border: 1px dashed var(--line); border-radius: var(--r);
+  color: var(--muted); font-size: 14px; line-height: 1.65;
+}
+.pronto b { color: var(--paper); font-weight: 600; }
+
+/* --- Barra de pestanas --------------------------------------------------- */
+nav.pestanas {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  /* Seis y no cinco desde que Fichas salio de dentro de Entrenar. En un movil
+     de 360 puntos eso son 60 por pestaña, que da para el icono y una palabra
+     corta: por eso pone «Fichas» y no «Flashcards», que no cabria. */
+  display: grid; grid-template-columns: repeat(8, 1fr);
+  background: var(--ink2);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 8px 2px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-size: 10px; letter-spacing: 0;
+  /* Solo color: nunca animar layout, que es lo que tira los fps. */
+  transition: color .15s;
+}
+.nav-item svg { width: 21px; height: 21px; stroke-width: 1.9; }
+/* Con seis pestañas, la etiqueta mas larga («Repertorio») roza el borde en las
+   pantallas estrechas. Un punto menos de letra y algo menos de espaciado lo
+   resuelve sin tocar el area tactil, que sigue siendo la celda entera. */
+@media (max-width: 380px) {
+  /* Ocho desde la Fase 38 (Blind): en 360 puntos son 45 por pestaña. */
+  .nav-item { font-size: 8.2px; letter-spacing: -.02em; padding: 8px 0; }
+  .nav-item svg { width: 19px; height: 19px; }
+}
+.nav-item[aria-selected="true"] { color: var(--paper); }
+.nav-item[aria-selected="true"] svg { stroke: var(--brass); }
+
+/* --- Cargando ------------------------------------------------------------ */
+.girando {
+  width: 18px; height: 18px; flex: none;
+  border: 2px solid var(--line); border-top-color: var(--paper);
+  border-radius: 50%;
+  animation: giro .7s linear infinite;
+}
+@keyframes giro { to { transform: rotate(360deg); } }
+
+/* Respeta a quien pide menos movimiento. No es adorno: para algunas personas
+   la animacion continua produce mareo real. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ===========================================================================
+   BOTONES DE ICONO Y FILAS PULSABLES
+   =========================================================================== */
+.icono {
+  width: 40px; height: 40px; flex: none;
+  display: grid; place-items: center;
+  background: none; border: 1px solid var(--line); border-radius: 10px;
+  color: var(--muted); cursor: pointer;
+}
+.icono:active { background: var(--ink3); color: var(--paper); }
+.icono svg { width: 19px; height: 19px; }
+
+/* La fila entera del curso es pulsable, pero el boton de borrar queda fuera:
+   si el area de abrir cubriera toda la tarjeta, borrar seria un accidente. */
+.item-abrir {
+  background: none; border: 0; padding: 0; text-align: left; color: inherit;
+  cursor: pointer; min-width: 0;
+}
+
+/* ===========================================================================
+   VISOR
+   =========================================================================== */
+#visor, #pos, #ent, #bl, #libro, #exp, #an-repaso, #lin {
+  position: fixed; inset: 0; z-index: 40;
+  background: var(--ink);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+/* Con el visor abierto, el fondo no debe desplazarse detras. */
+.sin-scroll { position: fixed; width: 100%; }
+
+/* --- Tablero -------------------------------------------------------------
+   aspect-ratio y no alto fijo: el tablero es cuadrado en cualquier movil sin
+   calcular nada en JavaScript, y no se deforma al girar la pantalla. */
+.tablero {
+  width: 100%;
+  max-width: min(100%, 78vh);   /* en apaisado, que no se coma la pantalla */
+  margin-inline: auto;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  /* Las FILAS tambien en 1fr. Sin esto son implicitas y de alto automatico:
+     se estiran con el contenido en vez de repartirse el cuadrado, y el tablero
+     sale con las casillas deformadas y desbordando por abajo. Que en algunos
+     navegadores se viera bien era casualidad de como resolvian el alto de un
+     SVG dentro de una fila automatica. */
+  grid-template-rows: repeat(8, 1fr);
+  /* touch-action none sobre el tablero: el gesto horizontal es nuestro
+     (avanzar y retroceder) y no debe arrastrar la pagina. */
+  touch-action: pan-y;
+  user-select: none;
+  /* Para las flechas del PGN (tablero-flechas), que van encima en absoluto.
+     Un hijo absoluto de una rejilla no ocupa celda: no descuadra las 64. */
+  position: relative;
+}
+/* min-height/min-width 0: por defecto un elemento de rejilla no encoge por
+   debajo de su contenido, y basta con eso para reventar el reparto en 1fr. */
+.casilla {
+  position: relative;
+  display: grid; place-items: stretch;
+  min-width: 0; min-height: 0;
+  overflow: hidden;
+}
+/* Madera clara y madera media, no las dos verdes de la paleta de la interfaz.
+   El tablero es lo unico de la pantalla que no es "la app": es el objeto que
+   uno mira, y conviene que se parezca al que tiene en la mesa. Van en sus
+   propias variables porque --sqlight y --sqdark siguen tinendo etiquetas,
+   barras y el logo, y cambiarlos ahi habria repintado media interfaz. */
+.casilla.clara  { background: var(--sq-clara); }
+.casilla.oscura { background: var(--sq-oscura); }
+/* La casilla de origen y destino de la ultima jugada. Sin esto, en una linea
+   larga uno pierde de vista que se acaba de mover. El amarillo verdoso es el
+   convenio de todos los tableros digitales; se lee igual sobre las dos
+   maderas, que es justo lo que no hacia el laton sobre la casilla clara. */
+.casilla.marcada::after {
+  content: ""; position: absolute; inset: 0;
+  background: rgba(155,199,0,.44); pointer-events: none;
+}
+
+/* z-index en la pieza, no en la marca: el pseudoelemento es el ultimo hijo de
+   la casilla y sin esto se pinta ENCIMA de la pieza, que sale desvaida y del
+   color de la marca en vez de blanca o negra. */
+.pieza {
+  width: 100%; height: 100%; display: block;
+  position: relative; z-index: 1;
+  pointer-events: none;   /* el toque es de la casilla, no de la pieza */
+}
+/* Las piezas de cburnett traen sus propios rellenos y contornos: aqui no se
+   pintan, solo se les da un poco de cuerpo. La sombra es minima a proposito;
+   una sombra marcada en una casilla de 40 px emborrona la silueta. */
+.pieza { filter: drop-shadow(0 1px 1px var(--sombra-pieza)); }
+
+/* --- Coordenadas ----------------------------------------------------------
+   Solo en la columna y la fila del borde, y del color de la casilla contraria
+   para que se lean sobre las dos maderas sin recuadro ni sombra. */
+.coord-f, .coord-c {
+  /* Por encima de la marca de pista (z-index 3): si no, la casilla de origen
+     de la pista se traga su propia letra y el tablero parece que ha perdido
+     una coordenada. */
+  position: absolute; z-index: 4;
+  font-style: normal; font-weight: 700; font-size: clamp(7px, 1.9vw, 11px);
+  line-height: 1; pointer-events: none; user-select: none;
+}
+.coord-f { top: 2px; left: 2.5px; }
+.coord-c { bottom: 1.5px; right: 2.5px; }
+.casilla.clara  .coord-f, .casilla.clara  .coord-c { color: var(--sq-oscura); }
+.casilla.oscura .coord-f, .casilla.oscura .coord-c { color: var(--sq-clara); }
+
+/* --- Pista del entrenador -------------------------------------------------
+   Un aro en la casilla de origen y un punto en la de destino, latiendo. La
+   jugada tambien se escribe en el mensaje: quien mira el tablero la ve, quien
+   mira el texto tambien, y nadie tiene que adivinar cual de los dos manda. */
+.pista-marca {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none; animation: latido 1.4s ease-in-out infinite;
+}
+.pista-marca.desde {
+  box-shadow: inset 0 0 0 4px rgba(217,164,65,.95);
+  background: rgba(217,164,65,.2);
+}
+.pista-marca.hasta {
+  background: radial-gradient(circle, rgba(217,164,65,.9) 0,
+                              rgba(217,164,65,.9) 28%, transparent 32%);
+}
+@keyframes latido { 0%, 100% { opacity: 1 } 50% { opacity: .5 } }
+
+/* --- Controles ------------------------------------------------------------ */
+.controles {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  padding: 12px 14px 4px;
+}
+.controles button {
+  display: grid; place-items: center;
+  padding: 11px 0;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r-s);
+  color: var(--paper); cursor: pointer;
+}
+.controles button:active { background: var(--ink3); }
+.controles button:disabled { opacity: .32; cursor: default; }
+.controles svg { width: 21px; height: 21px; }
+
+/* --- Comentario ----------------------------------------------------------- */
+.comentario {
+  margin: 10px 14px 0; padding: 12px 14px;
+  background: var(--ink2); border-left: 3px solid var(--brass); border-radius: 0 10px 10px 0;
+  font-size: 14px; line-height: 1.6;
+}
+
+/* --- Linea de jugadas -----------------------------------------------------
+   En una sola fila con scroll horizontal: una linea de 40 jugadas repartida en
+   varios renglones obliga a leer en zigzag para saber por donde vas. En fila,
+   el desplazamiento automatico deja la actual siempre a la vista. */
+.linea-jugadas {
+  display: flex; align-items: center; gap: 3px;
+  margin: 12px 0 0; padding: 10px 14px;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+}
+.linea-jugadas::-webkit-scrollbar { display: none; }
+.jug-num { color: var(--muted); font-size: 13px; margin-left: 7px; white-space: nowrap; }
+.jug-vacio { color: var(--muted); font-size: 14px; }
+.jug {
+  flex: none; min-height: 0;
+  padding: 5px 8px; border: 0; border-radius: 7px;
+  background: none; color: var(--paper);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px;
+  cursor: pointer; white-space: nowrap;
+}
+.jug.actual { background: var(--paper); color: var(--ink); font-weight: 600; }
+/* Las jugadas que vienen del hueco: se ven, pero no se tocan. En gris y con el
+   cursor por defecto, que es como se dice «esto no es un boton» sin escribirlo. */
+.jug.jug-fija { color: var(--muted); cursor: default; opacity: .85; }
+.jug.futura { color: var(--muted); }
+.jug-marca { color: var(--brass); margin-left: 1px; }
+
+/* --- Continuaciones ------------------------------------------------------- */
+.rotulo {
+  margin: 16px 14px 8px; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+}
+.continuaciones { display: flex; flex-direction: column; gap: 7px; padding: 0 14px; }
+.cont {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 13px;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r-s);
+  color: var(--paper); cursor: pointer; text-align: left;
+}
+.cont:active { background: var(--ink3); }
+/* La continuacion por la que va la linea actual va marcada: al retroceder,
+   deja claro cual de las opciones es la que estabas mirando. */
+.cont.en-linea { border-color: var(--brass); }
+.cont-san {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 15px; font-weight: 600; min-width: 62px;
+}
+.cont-barra { flex: 1; height: 6px; background: var(--ink3); border-radius: 3px; overflow: hidden; }
+.cont-barra i { display: block; height: 100%; background: var(--sqdark); }
+.cont-frec { color: var(--muted); font-size: 13px; min-width: 34px; text-align: right; }
+
+.resumen {
+  padding: 9px 14px; font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline;
+}
+.resumen-aviso { color: var(--brass); }
+
+/* El subtitulo de una fila nunca parte en dos renglones: filas de alturas
+   distintas en una lista se leen como si fueran cosas distintas. */
+.item .s { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Ni en la linea que dice QUIEN se salio de tu teoria: ahi el texto es el dato
+   —«juega ...g6 y tu solo tienes ...e6»— y cortado con puntos suspensivos no
+   sirve para nada. */
+.item .s.salida {
+  white-space: normal; overflow: visible; text-overflow: clip;
+  display: flex; flex-wrap: wrap; gap: 4px 7px; align-items: center;
+  margin-top: 5px; line-height: 1.45;
+}
+
+/* Salvo en las lineas propuestas desde tus partidas, donde el subtitulo ES la
+   linea de jugadas: recortarla con puntos suspensivos deja al usuario marcando
+   una casilla sin saber que esta guardando. */
+#mr-lista .item .s { white-space: normal; overflow: visible; text-overflow: clip; }
+#mr-lista .item .mono { line-height: 1.6; overflow-wrap: anywhere; }
+
+/* ===========================================================================
+   FASE 3 — entrada de jugadas, aperturas, editor
+   =========================================================================== */
+
+/* Casilla elegida y destinos posibles. El punto en el centro es el convenio de
+   todos los tableros digitales; inventarse otro solo confunde.
+
+   Van con radial-gradient sobre la casilla entera, igual que la pista, y NO con
+   un elemento de 30 % de ancho. El motivo es un fallo real: `.casilla` es una
+   rejilla, y un pseudoelemento absoluto sin `inset` se coloca en su posicion
+   estatica —la esquina de la celda—, no en el centro. El punto salia pequeno y
+   descolocado. Con el degradado no hay nada que centrar: el circulo se dibuja
+   siempre en el medio y escala solo con la casilla, que es lo que hacia que la
+   pista se viera bien y esto no. */
+.casilla.elegida { box-shadow: inset 0 0 0 3px var(--brass); }
+.casilla.destino::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle, var(--marca) 0 21%, transparent 22%);
+}
+/* Los destinos con captura se marcan con un anillo y no con un punto: el punto
+   quedaria tapado por la pieza que hay debajo. */
+.casilla.captura::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle, transparent 0 74%, var(--marca) 75%);
+}
+
+.apertura {
+  padding: 10px 14px; font-size: 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: baseline; gap: 8px;
+}
+.apertura-eco {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px; font-weight: 600; color: var(--brass);
+}
+
+
+/* ===========================================================================
+   FICHAS
+   ===========================================================================
+   Manda el tablero. Una posicion escrita en cincuenta caracteres no se
+   reconoce; dibujada, se reconoce de un vistazo, y toda esta pantalla existe
+   para reconocer posiciones de un vistazo.
+
+   Van agrupadas por archivo en <details> nativos: plegar y desplegar, el
+   teclado y el lector de pantalla salen gratis y sin una linea de JavaScript.
+   =========================================================================== */
+.rejilla-filtros {
+  display: grid; gap: 10px;
+  /* Dos columnas en cuanto caben. Con 150px de minimo, un movil de 360 puntos
+     se queda en una sola —seis desplegables apilados— y uno de 400 pasa a dos,
+     que es donde los filtros se leen como un panel y no como un formulario. */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+/* El input de busqueda trae de serie una cruz y una lupa con los colores del
+   sistema, que sobre fondo oscuro cantan. */
+#fc-buscar::-webkit-search-decoration,
+#fc-buscar::-webkit-search-results-button { display: none; }
+#fc-buscar::-webkit-search-cancel-button { filter: grayscale(1) opacity(.6); }
+
+/* --- El archivo, plegable ------------------------------------------------- */
+.archivo {
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r-s);
+  overflow: hidden;
+}
+.archivo + .archivo { margin-top: 8px; }
+.archivo > summary {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; cursor: pointer;
+  min-height: 44px;
+  list-style: none;   /* fuera el triangulo del navegador: hay flecha propia */
+}
+.archivo > summary::-webkit-details-marker { display: none; }
+.archivo > summary:active { background: var(--ink3); }
+.archivo > summary .t { font-weight: 600; font-size: 15px; }
+.archivo > summary .s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.archivo .flecha {
+  width: 18px; height: 18px; flex: none; color: var(--muted);
+  transition: transform .15s;
+}
+.archivo[open] .flecha { transform: rotate(90deg); }
+.archivo-cuerpo { padding: 0 12px 12px; }
+
+/* --- La rejilla de fichas ------------------------------------------------- */
+.rejilla-fichas {
+  display: grid; gap: 10px;
+  /* Un tablero de 150 puntos son casillas de 18: la pieza mas pequena —el
+     peon— sigue siendo reconocible ahi, y por debajo deja de serlo. Con ese
+     minimo, un movil normal pinta dos por fila y una tableta cuatro. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.ficha {
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 10px;
+  background: var(--ink); border: 1px solid var(--line); border-radius: var(--r-s);
+}
+
+/* El tablero de la ficha. Mismas casillas que el grande —hereda .clara y
+   .oscura— pero sin coordenadas, sin marcas y sin eventos. */
+.ficha-tablero {
+  display: grid; grid-template-columns: repeat(8, 1fr);
+  aspect-ratio: 1; width: 100%;
+  border-radius: 6px; overflow: hidden;
+}
+
+.ficha .t { font-size: 14px; }
+.ficha .s { font-size: 11.5px; line-height: 1.4; }
+.ficha-pie { color: var(--muted); font-size: 11.5px; }
+.ficha-pie .mal-txt { color: var(--mal-texto); font-weight: 600; }
+
+/* El FEN. Sigue estando porque sirve para pegar la posicion en Lichess o en el
+   motor, que es otra cosa distinta de mirarla; pero ya no es lo primero que se
+   ve, asi que va pequeno y al pie.
+
+   `word-break` no es opcional: es texto largo sin espacios, y sin el ensancha
+   la pagina entera y aparece un scroll horizontal en toda la app. */
+.ficha-fen {
+  display: flex; align-items: center; gap: 6px;
+  /* Envuelve: en una ficha de 170 puntos, el FEN y los dos botones en la misma
+     linea dejaban al FEN una columna de dos caracteres —«r1bq kbn»— que no es
+     ni un dato ni un adorno. El texto se lleva la linea entera y los botones
+     caen debajo. */
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: 8px;
+}
+.ficha-fen code {
+  flex: 1 1 100%; min-width: 0;
+  font-size: 10px; line-height: 1.45; color: var(--muted);
+  word-break: break-all;
+  /* Seleccionable de verdad: mucha gente lo va a coger a mano en vez de usar
+     el boton, sobre todo en un navegador sin permiso de portapapeles. */
+  user-select: all; -webkit-user-select: all;
+  /* Tres lineas como mucho: un FEN entero a este tamano ocupa mas alto que el
+     propio tablero, y no es lo que se ha venido a ver. El desvanecido del
+     final avisa de que sigue —cortado a hacha parece un dato corrupto— y no
+     estorba a la seleccion: se selecciona el texto entero igual. */
+  max-height: 3.2em; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+}
+.ficha-fen .btn { flex: none; margin-left: auto; padding: 6px 9px; font-size: 12px; min-height: 32px; }
+.ficha-fen .icono { flex: none; width: 32px; height: 32px; min-height: 32px; }
+
+/* El FEN de dentro de la sesion de repaso: ahi si es una linea ancha y con
+   sitio, porque es la unica cosa escrita de la pantalla. */
+#ent-fen { margin: 0 0 2px; flex-wrap: nowrap; }
+#ent-fen code {
+  flex: 1 1 auto; font-size: 11.5px; max-height: none;
+  -webkit-mask-image: none; mask-image: none;
+}
+#ent-fen .btn { margin-left: 0; }
+
+/* --- Editor de linea y administracion ------------------------------------- */
+#editor, #admin {
+  position: fixed; inset: 0; z-index: 45;
+  background: var(--ink);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+/* La chincheta del boton de accesos: cuantos esperan aprobacion. Va en numero y
+   no en punto rojo porque «3» dice si es una persona o es una avalancha. */
+.chincheta {
+  position: absolute; top: 2px; right: 0;
+  min-width: 17px; height: 17px; padding: 0 4px;
+  border-radius: 9px;
+  /* Dorada y no azul: el azul es el color de «esto se puede tocar» y esta por
+     toda la interfaz, asi que una chincheta azul se perderia entre iconos. El
+     dorado solo aparece aqui y en el logo, y por eso se ve. */
+  background: var(--oro); color: var(--ink);
+  font-size: 11px; font-weight: 700; line-height: 17px; text-align: center;
+}
+#btn-admin { position: relative; }
+
+/* --- Coronacion ----------------------------------------------------------- */
+.promocion {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--velo);
+  display: grid; place-items: center;
+}
+.promocion-caja {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  padding: 14px; max-width: 320px; width: 86%;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r);
+}
+.promocion-caja button {
+  padding: 6px; background: var(--sqdark); border: 0; border-radius: var(--r-s);
+  cursor: pointer;
+}
+.promocion-caja .promocion-cancelar {
+  grid-column: 1 / -1; background: none; border: 1px solid var(--line);
+  color: var(--muted); font-size: 14px; padding: 10px;
+}
+.promocion-caja .pieza { height: 52px; }
+
+
+/* ===========================================================================
+   RIVAL
+   =========================================================================== */
+/* Un bloque de apertura empieza plegado: con quince bloques abiertos la
+   pantalla es un muro y no se distingue lo importante de lo anecdotico. */
+.bloque .despliegue { display: none; margin-top: 10px; }
+.bloque.abierto .despliegue { display: flex; }
+.bloque [data-bloque] { color: inherit; font: inherit; cursor: pointer; }
+
+.etiqueta.mal { background: var(--mal-fondo); color: var(--mal-texto); }
+
+#rv-cuerpo { display: flex; flex-direction: column; gap: 12px; }
+/* La pestaña activa, en los cuatro sitios donde hay pestañas dentro de una
+   pantalla: las dos vistas del rival, el filtro de «Qué juega», los dos colores
+   de las partidas de élite y los tres estados de la lista de accesos. */
+/* Tres vistas y una de ellas se llama «Contra tu repertorio»: en una fila de
+   tres, ese rotulo baja a cuatro puntos de letra en un movil de 360. En rejilla
+   de dos, «Todas las partidas» ocupa el ancho debajo y las tres se leen. */
+.rv-vistas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rv-vistas [data-vista="todas"] { grid-column: 1 / -1; }
+
+/* El boton de reproducir de «Todas las partidas». No crece: la fila la manda
+   el nombre del contrario, y un boton elastico hace que cada fila corte el
+   nombre por un sitio distinto y la lista parezca torcida. */
+/* La linea de fecha y color, un punto mas pequena que la apertura: son el
+   dato de contexto, no el que hace reconocer la partida. */
+.pt-pie { font-size: 11.5px; margin-top: 1px; }
+/* Fase 33: partida atribuida por nombre, no por ID FIDE. Pequena y dentro
+   de la linea: es un matiz de la fila, no un aviso. */
+/* Fase 34: «Guardado hoy a las 10:12 · buscando partidas nuevas…». Encima
+   de la cabecera del rival y sin empujar nada al cambiar de texto. */
+#rv-refresco { margin-bottom: 12px; font-size: 13.5px; }
+.pt-pie .por-nombre { padding: 1px 6px; font-size: 10.5px; }
+/* Con la marca la linea no cabe en 390 puntos: se deja bajar a una segunda
+   en vez de cortar la marca en «por no…». */
+.pt-pie.con-marca { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.7; }
+
+/* Fase 31: cabecera de cada torneo en «Todas las partidas» y su desplegable. */
+.pt-torneo { padding: 10px 2px 2px; border-bottom: 1px solid var(--line); }
+.pt-torneo:first-child { padding-top: 0; }
+.pt-torneo .t { font-weight: 600; font-size: 13.5px; color: var(--brass); }
+.pt-torneo .s { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.pt-filtro select { width: 100%; min-width: 0; text-overflow: ellipsis; }
+
+.pt-ver { flex: none; display: inline-flex; align-items: center; gap: 6px; }
+.pt-ver svg { width: 13px; height: 13px; }
+
+#rv-vistas [aria-selected="true"],
+#an-vistas [aria-selected="true"],
+#tr-vistas [aria-selected="true"],
+#rv-filtro [aria-selected="true"],
+#el-colores [aria-selected="true"],
+#ad-filtros [aria-selected="true"] {
+  background: var(--ink3); border-color: var(--azul); color: var(--paper);
+  font-weight: 600;
+}
+#el-colores [disabled] { opacity: .45; }
+
+.pos-panel {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px;
+}
+.pos-panel .rotulo { margin: 12px 0 4px; }
+#pos-linea { line-height: 1.7; word-break: break-word; }
+
+
+/* ===========================================================================
+   ENTRENAR
+   =========================================================================== */
+.ent-panel {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px;
+}
+/* Alto minimo fijo: el mensaje cambia de una linea a tres segun se acierte o
+   se falle, y sin reservar el hueco el tablero da un salto en cada jugada. */
+.ent-mensaje {
+  /* Bloque en flujo normal, NO flex: dentro hay <b> en mitad de una frase, y en
+     un contenedor flex cada hijo se convierte en item y el navegador se come
+     los espacios que los separan. Sale "EraNf3, no a4." */
+  min-height: 52px;
+  padding: 15px 14px; border-radius: var(--r-s);
+  border: 1px solid var(--line); background: var(--ink2);
+  font-size: 15px; line-height: 1.45;
+}
+.ent-mensaje.bien  { border-color: var(--ok-borde); background: var(--ok-fondo); color: var(--ok-texto); }
+.ent-mensaje.mal   { border-color: var(--mal-borde); background: var(--mal-fondo); color: var(--mal-texto); }
+/* La pista no es ni acierto ni fallo: es el laton de la casa, el mismo color
+   con el que late la casilla en el tablero. Que los dos avisos sean del mismo
+   color es lo que hace que se lean como una sola cosa. */
+.ent-mensaje.pista { border-color: var(--pista-borde); background: var(--pista-fondo); color: var(--pista-texto); }
+.ent-mensaje .apunte { color: var(--muted); font-weight: 400; }
+.ent-mensaje.bien .apunte,
+.ent-mensaje.mal .apunte,
+.ent-mensaje.pista .apunte { opacity: .8; color: inherit; }
+#ent-linea { line-height: 1.7; word-break: break-word; }
+/* El boton de pista, discreto: esta siempre disponible pero no debe competir
+   con el tablero por la atencion. */
+#ent-pista, #ent-ver, #bl-pista, #bl-ver { font-size: 14px; padding: 10px; }
+
+/* Repaso a ciegas (Fase 32): un filo de laton alrededor del tablero dice
+   «esto no es la posicion de verdad» sin taparlo con un letrero. */
+/* Un marco en un ::after por encima de las casillas, y no box-shadow ni
+   outline: el tablero va de borde a borde del movil, asi que un borde por
+   fuera queda cortado, y las casillas son `position: relative` y se pintan
+   ENCIMA de cualquier cosa que dibuje el propio contenedor. */
+.tablero.ciega::after {
+  content: ''; position: absolute; inset: 0; z-index: 3;
+  border: 3px solid var(--brass); pointer-events: none;
+}
+#ent-linea .ciega-corte { color: var(--brass); font-size: 11px; vertical-align: 1px; }
+
+/* ===========================================================================
+   LIBRO DEL RIVAL
+   =========================================================================== */
+#lb-cuerpo:not(:empty) { padding: 14px; }
+/* La lista de sus partidas se lee de arriba abajo y no debe pegarse al borde,
+   pero el resto del panel ya trae su propio margen: por eso el hueco va aqui y
+   no en un contenedor comun. */
+#lb-partidas { gap: 7px; }
+#lb-partidas .t { font-size: 15px; }
+/* La etiqueta del resultado, siempre del mismo ancho: con "1", "0" y "½" de
+   anchos distintos, los nombres de los contrarios salen desalineados y la
+   lista se lee como si estuviera rota. */
+#lb-partidas .etiqueta {
+  min-width: 26px; text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+/* Las jugadas del libro llevan una marca mas que las del visor (el ✓ o el ⚑),
+   y sin encogerla el SAN pierde sitio en un movil estrecho. */
+#lb-jugadas .cont .etiqueta { padding: 2px 6px; font-size: 12px; }
+
+/* ===========================================================================
+   EXPLORADOR DE MAESTROS
+   =========================================================================== */
+/* La fila de una partida modelo es un <div> con un boton dentro y el enlace a
+   Lichess fuera del boton (un <a> dentro de un <button> es HTML invalido). El
+   boton tiene que parecer parte de la fila, no un boton. */
+.ex-fila {
+  display: flex; align-items: center; gap: 12px;
+  flex: 1; min-width: 0;
+  padding: 0; margin: 0;
+  background: none; border: 0; color: inherit; font: inherit;
+  text-align: left; cursor: pointer;
+}
+#ex-partidas { gap: 7px; }
+#ex-partidas .etiqueta {
+  min-width: 34px; text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+#ex-partidas .item > .btn { flex: none; padding: 6px 10px; }
+
+/* ===========================================================================
+   MODO DIA
+   ===========================================================================
+   Tres estados, no dos: claro, oscuro y "el que diga el sistema". El tercero
+   es el que casi todo el mundo quiere y el unico que acierta a las ocho de la
+   tarde sin que nadie toque nada, asi que es el que hay por defecto.
+
+   Se escribe una sola vez y se aplica de dos formas: por `prefers-color-scheme`
+   cuando el usuario no ha elegido, y por `[data-tema="claro"]` cuando si. La
+   regla del sistema lleva `:not([data-tema="oscuro"])` para que elegir oscuro
+   a mano gane sobre un movil en modo dia.
+
+   Solo se redefinen VARIABLES. Si una regla de arriba tiene un color escrito a
+   pelo, aqui no hay forma de alcanzarla: por eso el bloque anterior saco a
+   variables los avisos, las etiquetas y las marcas del tablero.
+
+   El tablero NO cambia. Las dos maderas se ven igual de bien sobre papel que
+   sobre tinta, y un tablero que cambia de color al anochecer es justo lo que
+   nadie ha pedido nunca. --tinta-fija tampoco: es la de encima de las cosas
+   que son claras en los dos temas. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-tema="oscuro"]) {
+    --ink:     #F3F5F9;
+    --ink2:    #FFFFFF;
+    --ink3:    #EEF1F6;
+    --line:    #DDE3EC;
+    --paper:   #0F172A;
+    --muted:   #5A6478;
+    --azul:       #1D4ED8;
+    --azul-claro: #3B82F6;
+    --oro:        #8A5F0F;
+    --oro-fondo:  #F3E4C2;
+    --marca-grad: linear-gradient(120deg, #1D4ED8 0%, #2563EB 45%, #8A5F0F 100%);
+    --brass:      var(--azul);
+    /* Sobre papel el damero tiene que ser AUN mas flojo: lo que sobre marino se
+       intuye, sobre blanco se ve como una cuadricula de libreta. */
+    --brillo-azul: rgba(37, 99, 235, .10);
+    --brillo-oro:  rgba(224, 184, 76, .10);
+    --rejilla:     rgba(15, 23, 42, .030);
+    --dam-azul:    rgba(37, 99, 235, .055);
+    --dam-oro:     rgba(180, 140, 50, .035);
+    --fondo-alto:  #F7F9FC;
+
+    --ok-borde:   #A9CDB2;  --ok-fondo:   #E4F2E7;  --ok-texto:   #1D5B2E;
+    --mal-borde:  #E3B0AA;  --mal-fondo:  #FBEAE7;  --mal-texto:  #8C2B20;
+    --pista-borde:#DEC48A;  --pista-fondo:#FBF1DA;  --pista-texto:#7A5710;
+    --brass-fondo:#E4ECFF;
+    --velo:       rgba(15,23,42,.5);
+    --marca:      rgba(20,26,22,.34);
+    --sombra-pieza: rgba(0,0,0,.22);
+
+    color-scheme: light;
+  }
+}
+
+:root[data-tema="claro"] {
+  --ink:     #F3F5F9;
+  --ink2:    #FFFFFF;
+  --ink3:    #EEF1F6;
+  --line:    #DDE3EC;
+  --paper:   #0F172A;
+  --muted:   #5A6478;
+  --azul:       #1D4ED8;
+  --azul-claro: #3B82F6;
+  --oro:        #8A5F0F;
+  --oro-fondo:  #F3E4C2;
+  --marca-grad: linear-gradient(120deg, #1D4ED8 0%, #2563EB 45%, #8A5F0F 100%);
+  --brass:      var(--azul);
+  /* Sobre papel el damero tiene que ser AUN mas flojo: lo que sobre marino se
+     intuye, sobre blanco se ve como una cuadricula de libreta. */
+  --brillo-azul: rgba(37, 99, 235, .10);
+  --brillo-oro:  rgba(224, 184, 76, .10);
+  --rejilla:     rgba(15, 23, 42, .030);
+  --dam-azul:    rgba(37, 99, 235, .055);
+  --dam-oro:     rgba(180, 140, 50, .035);
+  --fondo-alto:  #F7F9FC;
+
+  --ok-borde:   #A9CDB2;  --ok-fondo:   #E4F2E7;  --ok-texto:   #1D5B2E;
+  --mal-borde:  #E3B0AA;  --mal-fondo:  #FBEAE7;  --mal-texto:  #8C2B20;
+  --pista-borde:#DEC48A;  --pista-fondo:#FBF1DA;  --pista-texto:#7A5710;
+  --brass-fondo:#E4ECFF;
+  --velo:       rgba(15,23,42,.5);
+  --marca:      rgba(20,26,22,.34);
+  --sombra-pieza: rgba(0,0,0,.22);
+
+  color-scheme: light;
+}
+
+/* El unico color a pelo que sobrevive: el `:active` del boton primario, que en
+   modo dia tiene que oscurecer en vez de aclarar. */
+:root[data-tema="claro"] .btn-primario:active { background: #1E2A44; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-tema="oscuro"]) .btn-primario:active { background: #1E2A44; }
+}
+
+/* Las tarjetas necesitan un borde algo mas visible sobre papel: sin sombra, un
+   blanco sobre casi blanco se pierde. */
+:root[data-tema="claro"] .tarjeta,
+:root[data-tema="claro"] .item {
+  box-shadow: 0 1px 2px rgba(15,23,42,.06);
+}
+
+/* ===========================================================================
+   EL TABLERO NO SE PIERDE DE VISTA
+   ===========================================================================
+   La cabecera y el tablero viajan juntos en un bloque pegajoso. Antes, para
+   llegar a las continuaciones habia que bajar, y al bajar el tablero se iba de
+   la pantalla: uno leia "Bg5 · 41 %" sin poder mirar la posicion, que es
+   justo lo contrario de lo que hace falta.
+
+   Van los dos juntos y no solo el tablero porque el boton de cerrar y el de
+   girar viven en la cabecera, y un tablero pegado arriba con la cabecera fuera
+   deja al usuario sin salida.
+
+   Solo cuando la pantalla es lo bastante alta. En apaisado, un tablero fijo se
+   come todo el alto y no queda sitio para leer nada. */
+@media (min-height: 620px) {
+  .cabeza-fija {
+    position: sticky; top: 0; z-index: 22;
+    background: var(--ink);
+    box-shadow: 0 6px 12px -8px rgba(0,0,0,.5);
+  }
+  /* En pantallas justas, el tablero cede altura para que el panel respire. */
+  .cabeza-fija .tablero { max-width: min(100%, 62vh); }
+}
+
+/* El boton del tema enseña el icono de LO QUE VA A PASAR al pulsarlo, no el de
+   lo que hay: en modo noche se ve un sol («dale y se hace de día»). Es el
+   convenio de casi todas las apps y el que menos hace dudar. */
+#btn-tema .icono-dia   { display: block; }
+#btn-tema .icono-noche { display: none; }
+:root[data-tema="claro"] #btn-tema .icono-dia   { display: none; }
+:root[data-tema="claro"] #btn-tema .icono-noche { display: block; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-tema="oscuro"]) #btn-tema .icono-dia   { display: none; }
+  :root:not([data-tema="oscuro"]) #btn-tema .icono-noche { display: block; }
+}
+
+/* Aviso de que no hay red. Pegado bajo la cabecera y no flotando encima de
+   nada: tiene que verse siempre que se mire la pantalla, no solo al aparecer,
+   porque lo que explica —que estas viendo datos de antes— dura toda la sesion
+   sin cobertura. */
+.sin-red {
+  position: sticky; top: 0; z-index: 19;
+  padding: 8px 16px;
+  background: var(--pista-fondo); color: var(--pista-texto);
+  border-bottom: 1px solid var(--pista-borde);
+  font-size: 13px; text-align: center;
+}
+
+/* La barra de instalar. Abajo y no arriba: se enseña encima de la navegación,
+   que es donde el pulgar ya está, y así no empuja el contenido de la pantalla
+   hacia abajo cada vez que aparece. El `env(safe-area-inset-bottom)` es por el
+   iPhone, que es justo donde más falta hace —allí la instalación es manual—. */
+.instalar {
+  position: fixed; left: 0; right: 0;
+  bottom: calc(var(--nav) + 6px + env(safe-area-inset-bottom, 0px));
+  z-index: 24;
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 10px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: var(--ink2); color: var(--paper);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  font-size: 13px; line-height: 1.35;
+  animation: sube .25s ease-out;
+}
+/* Sin la app montada —pantalla de acceso, sala de espera, cargando— no hay
+   barra de pestañas debajo, así que la separación de 62 puntos dejaría la barra
+   flotando en medio de la nada. `:has` es de 2023 y está en todo lo que
+   importa; si faltara, lo peor que pasa es que quede algo alta. */
+body:has(#app.oculto) .instalar { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+.instalar b { color: var(--oro); font-weight: 600; }
+.instalar .btn { flex: 0 0 auto; }
+@keyframes sube { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .instalar { animation: none; } }
+
+
+/* ===========================================================================
+   LA SUGERENCIA DEL DIA, JUGABLE
+
+   Antes era un renglón: «1.e4 e6 2.d4 d5 3.Cc3» y una frase. Se lee y no se
+   entiende — una línea escrita hay que reproducirla mentalmente, y a la quinta
+   jugada uno ya no sabe dónde está el alfil. Con el tablero delante y las
+   flechas debajo, la misma información se mira en vez de descifrarse.
+
+   El tablero es pequeño a propósito (240 puntos de tope): es una tarjeta de la
+   pantalla de Inicio, no la pantalla de estudio. Para eso está «Explorar desde
+   aquí», que abre el explorador entero.
+   =========================================================================== */
+#sugerencia { display: flex; flex-direction: column; gap: 10px; }
+
+.sug-tablero {
+  display: grid; grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1;
+  width: 100%; max-width: 240px; margin-inline: auto;
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+/* Las jugadas, como fichas pulsables. Se envuelven en varias líneas porque una
+   línea de catorce medias jugadas no cabe en un móvil, y cortarla con puntos
+   suspensivos escondería justo el final, que es donde está la propuesta. */
+.sug-jugadas {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: 2px 4px;
+  font-size: 13px; line-height: 1.5;
+}
+.sug-num { color: var(--muted); }
+.sug-san {
+  /* `min-height` a cero contra la regla global de 44 px: aquí son fichas de
+     texto dentro de un párrafo, no botones de acción, y a 44 px de alto la
+     línea de jugadas ocuparía media tarjeta. El objetivo táctil lo da el
+     padding lateral más el interlineado. */
+  min-height: 0;
+  padding: 2px 5px; border: 0; border-radius: 5px;
+  background: none; color: var(--paper); font: inherit; cursor: pointer;
+}
+.sug-san:hover { background: var(--ink3); }
+/* Dónde estoy: fondo lleno. Cuál es la propuesta: subrayado dorado. Son dos
+   cosas distintas y tienen que poder verse a la vez —normalmente coinciden,
+   pero en cuanto retrocedes dejan de hacerlo, y ahí es cuando hace falta
+   recordar a dónde se volvía—. */
+.sug-san.aqui { background: var(--brass-fondo); color: var(--azul-claro); font-weight: 600; }
+.sug-san.propuesta { box-shadow: inset 0 -2px 0 var(--oro); }
+
+#sug-donde { align-self: center; }
+
+
+/* ===========================================================================
+   ASISTENTE — la burbuja
+   ===========================================================================
+   z-index 35: por encima de la barra de pestanas (30) y por debajo de las
+   pantallas superpuestas (40). Asi, con el visor o el entrenador abiertos, la
+   burbuja desaparece sola y no hay que acordarse de esconderla en JavaScript.
+   =========================================================================== */
+#burbuja {
+  position: fixed; right: 14px; z-index: 35;
+  bottom: calc(var(--nav) + env(safe-area-inset-bottom) + 14px);
+  width: 54px; height: 54px; border-radius: 50%;
+  display: block; padding: 0;
+  /* Sin fondo ni borde: el logo ya es un circulo opaco con su aro dorado, y
+     encima de eso cualquier borde nuestro se ve como un segundo aro mal
+     centrado. La sombra si, y no es adorno: sin ella, sobre una lista larga de
+     cursos, el logo se confunde con la foto de una tarjeta mas. */
+  background: none; border: 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+  cursor: pointer;
+  transition: transform .12s;
+}
+#burbuja img {
+  width: 100%; height: 100%; border-radius: 50%; display: block;
+  /* El PNG trae alfa alrededor del aro: sin recortarlo, la sombra de la caja
+     se ve como un cuadrado con las esquinas asomando. */
+  -webkit-user-select: none; user-select: none;
+}
+#burbuja:active { transform: scale(.93); }
+
+/* La chincheta del bocadillo. Dorada como la de accesos pendientes, por la
+   misma razon: el azul esta por toda la interfaz y ahi se perderia. */
+.burbuja-marca {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--oro); color: var(--tinta-fija);
+  border: 2px solid var(--ink);
+}
+.burbuja-marca svg { width: 12px; height: 12px; }
+
+#asis {
+  position: fixed; inset: 0; z-index: 36;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+/* `touch-action: none` y no `.sin-scroll` en el body: esa clase lo pone en
+   `position: fixed` y al cerrar la hoja el usuario aparece arriba del todo,
+   perdiendo el sitio de la lista que estaba mirando. */
+#asis-velo { position: absolute; inset: 0; background: var(--velo); touch-action: none; }
+
+#asis-hoja {
+  position: relative;
+  max-height: min(78dvh, 620px);
+  display: flex; flex-direction: column;
+  background: var(--ink2);
+  border: 1px solid var(--line); border-bottom: 0;
+  border-radius: var(--r) var(--r) 0 0;
+  animation: asis-sube .18s ease-out;
+}
+@keyframes asis-sube {
+  from { transform: translateY(14px); opacity: .5; }
+  to   { transform: none; opacity: 1; }
+}
+
+.asis-barra {
+  flex: none;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 8px 14px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.asis-tira {
+  width: 38px; height: 4px; border-radius: 2px;
+  background: var(--line); align-self: center; margin-bottom: 2px;
+}
+#asis-q {
+  width: 100%; padding: 11px 13px;
+  background: var(--ink); color: var(--paper);
+  border: 1px solid var(--line); border-radius: var(--r-s);
+  font: inherit; font-size: 16px;   /* 16px o iOS hace zoom al enfocar */
+}
+#asis-q::placeholder { color: var(--muted); }
+
+#asis-cuerpo {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 14px max(16px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.asis-intro { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.asis-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.asis-chip {
+  padding: 8px 12px; border-radius: 999px;
+  background: var(--ink3); color: var(--paper);
+  border: 1px solid var(--line); font: inherit; font-size: 13px; cursor: pointer;
+}
+.asis-chip:active { background: var(--line); }
+
+.asis-rotulo {
+  margin: 6px 0 0; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+}
+.asis-r {
+  display: flex; flex-direction: column; gap: 3px; text-align: left;
+  padding: 11px 12px; width: 100%;
+  background: var(--ink3); color: var(--paper);
+  border: 1px solid var(--line); border-radius: var(--r-s);
+  font: inherit; cursor: pointer;
+}
+.asis-r:active { background: var(--line); }
+.asis-r-t { font-size: 15px; font-weight: 600; }
+.asis-r-s { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+.asis-atras {
+  align-self: flex-start; padding: 4px 0;
+  background: none; border: 0; color: var(--brass);
+  font: inherit; font-size: 14px; cursor: pointer;
+}
+.asis-det-t { margin: 2px 0 0; font-size: 17px; font-weight: 700; }
+.asis-det-r { margin: 0; font-size: 14.5px; line-height: 1.65; }
+.asis-en { color: var(--muted); font-size: 13px; }
+.asis-linea {
+  margin: 0; padding: 10px 12px; font-size: 14px; line-height: 1.7;
+  background: var(--ink); border: 1px solid var(--line); border-radius: var(--r-s);
+  word-break: break-word;
+}
+/* Los botones de accion se envuelven: «Verla en el explorador» y «¿La tengo en
+   mi repertorio?» no caben en una linea de 360 puntos. */
+.asis-acc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+
+/* --- La conversacion (Fase 35) ---------------------------------------------
+   Burbujas sencillas: la tuya a la derecha y en laton, la del asistente a lo
+   ancho, porque lleva tablas de jugadas y botones y no cabe en un bocadillo. */
+.asis-msg { font-size: 14.5px; line-height: 1.6; word-break: break-word; }
+.asis-msg.yo {
+  align-self: flex-end; max-width: 85%;
+  padding: 9px 12px; border-radius: var(--r-s) var(--r-s) 4px var(--r-s);
+  background: var(--brass-fondo); color: var(--paper);
+}
+.asis-msg.bot {
+  /* Bloque y NO flex: dentro hay <b> en mitad de las frases, y en un flex cada
+     trozo se vuelve un item y se comen los espacios («Cuenca Jimenez,con
+     blancas»). Es el mismo fallo de .ent-mensaje. */
+  padding: 11px 12px; border-radius: var(--r-s);
+  background: var(--ink3); border: 1px solid var(--line);
+}
+.asis-msg.bot > .asis-acc { margin-top: 10px; }
+.asis-nota { color: var(--muted); font-size: 12.5px; }
+.asis-tabla { display: flex; flex-direction: column; gap: 2px; margin: 4px 0; }
+.asis-fila {
+  display: grid; grid-template-columns: minmax(64px, auto) 44px 1fr; gap: 8px;
+  align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--line);
+}
+.asis-fila:last-child { border-bottom: 0; }
+#asis-q { min-width: 0; }
+/* Fase 37: el micro escuchando late en rojo, como el piloto del sistema. */
+#asis-micro.oyendo { color: #fff; background: #c0392b; border-radius: 50%; animation: latido-micro 1.1s ease-in-out infinite; }
+@keyframes latido-micro { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, #c0392b 25%, transparent); } }
+@media (prefers-reduced-motion: reduce) { #asis-micro.oyendo { animation: none; } }
+
+
+/* ===========================================================================
+   OBJETIVOS Y RANGOS
+   =========================================================================== */
+#obj-cuerpo { display: flex; flex-direction: column; gap: 14px; }
+
+.pg-rango { display: flex; align-items: baseline; gap: 10px; }
+/* El rango, grande y en el degradado de la marca. Es el unico numero de la app
+   que no mide nada: mide lo que llevas hecho, y merece leerse desde lejos. */
+.pg-rango-n {
+  font-size: 26px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15;
+  background: var(--marca-grad); -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+}
+
+/* Una barra y no un porcentaje escrito: «faltan 1.400 para Maestro» dice
+   cuanto, y la barra dice si eso es mucho o poco, que es la otra mitad. */
+.pg-barra {
+  display: block; height: 8px; margin-top: 2px;
+  background: var(--ink3); border-radius: 4px; overflow: hidden;
+}
+.pg-barra i { display: block; height: 100%; border-radius: 4px; transition: width .35s ease-out; }
+.pg-oro  { background: var(--marca-grad); }
+.pg-azul { background: var(--azul); }
+.pg-ok   { background: var(--ok-texto); }
+
+.pg-meta { display: flex; flex-direction: column; gap: 3px; }
+.pg-meta + .pg-meta { margin-top: 8px; }
+.pg-hecho { color: var(--ok-texto); font-weight: 600; }
+
+.pg-racha {
+  display: flex; align-items: center; gap: 9px;
+  margin-top: 4px; padding: 10px 12px;
+  background: var(--ink3); border-radius: var(--r-s);
+  font-size: 13.5px; line-height: 1.45;
+}
+/* Una llama dibujada y no el emoji: los emoji los pinta cada sistema a su
+   manera y el de Android desentona con todo lo demas. Dorada, como la
+   chincheta de accesos: es el color que en esta app significa «esto es tuyo y
+   lo has ganado». */
+.pg-llama { width: 17px; height: 17px; flex: none; color: var(--oro); }
+
+#obj-cuerpo .item { align-items: flex-start; }
+#obj-cuerpo .item .pg-barra { margin-top: 6px; }
+
+/* ===========================================================================
+   ANALISIS (Fase 27)
+   ===========================================================================
+   Cuatro botones en rejilla de dos: en 360 puntos, cuatro en fila dejan
+   «Chess.com» y «Aperturas» cortados. */
+.an-vistas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.an-vistas { grid-template-columns: repeat(3, 1fr); }
+.an-vistas .btn { padding-inline: 4px; }
+@media (min-width: 560px) {
+  .an-vistas { grid-template-columns: repeat(6, 1fr); }
+}
+.an-origen { color: var(--muted); font-size: 12px; margin: 0 2px 10px; }
+.an-origen b { color: var(--paper); }
+#an-cuerpo { display: flex; flex-direction: column; gap: 12px; }
+
+.an-barra { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--ink3); }
+.an-barra span { min-width: 0; }
+.an-barra .ok, .punto.ok { background: var(--ok-texto); }
+.an-barra .brass, .punto.brass { background: var(--brass); }
+.an-barra .mal, .punto.mal { background: var(--mal-texto); }
+.an-leyenda { gap: 6px; font-size: 13px; }
+.punto { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+.an-variante {
+  background: var(--ink); border: 1px solid var(--line); border-radius: var(--r-s);
+  padding: 9px 11px; text-align: left; color: inherit; cursor: pointer; min-height: 44px;
+}
+
+/* Tarjeta de fallo: tablero pequeño a la izquierda y el texto al lado. En una
+   columna, con el tablero a lo ancho, cada fallo ocupaba la pantalla entera y
+   no se podian comparar dos de un vistazo. */
+.an-fallos { display: flex; flex-direction: column; gap: 10px; }
+.an-fallo { flex-direction: row; align-items: flex-start; gap: 12px; }
+.an-fallo .ficha-tablero { width: 118px; flex: none; }
+.an-filtro {
+  background: var(--ink2); border: 1px solid var(--azul); border-radius: var(--r-s);
+  padding: 6px 6px 6px 12px; font-size: 13px;
+}
+
+.an-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.an-chip {
+  font-size: 12.5px; padding: 5px 10px; border-radius: 999px;
+  background: var(--ink3); color: var(--paper);
+}
+.an-chip b { color: var(--muted); font-weight: 600; margin-right: 3px; }
+.an-pgn summary { cursor: pointer; font-size: 14px; font-weight: 600; min-height: 28px; }
+.an-pgn[open] summary { margin-bottom: 4px; }
+
+/* ===========================================================================
+   ANALISIS — estilo LotusChess (Fase 27 D)
+   =========================================================================== */
+.an-hoy {
+  border-radius: var(--r); padding: 16px 16px 12px; color: #fff;
+  background: linear-gradient(115deg, #7b4bd8 0%, #d8263a 55%, #f07a1a 100%);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .14);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.an-hoy-t { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.an-hoy-fila {
+  display: flex; align-items: center; gap: 10px; min-height: 44px;
+  background: rgba(255, 255, 255, .14); border: 0; border-radius: 10px;
+  padding: 8px 12px; color: #fff; font: inherit; font-size: 15px; text-align: left; cursor: pointer;
+}
+.an-hoy-fila span[aria-hidden] { font-size: 22px; line-height: 1; }
+.an-hoy-pie { font-size: 12px; opacity: .85; text-decoration: underline; margin-top: 4px; }
+
+.an-carr-t { margin: 8px 2px -2px; font-size: 19px; font-weight: 600; }
+/* Carrusel con scroll horizontal y enganche: se ve asomar la siguiente
+   tarjeta, que es la pista de que hay mas. */
+.an-carrusel {
+  display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+  margin-inline: -16px; padding: 4px 16px 12px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.an-carrusel::-webkit-scrollbar { display: none; }
+.an-tarjeta {
+  flex: 0 0 min(44vw, 190px); scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 10px; padding: 12px;
+  background: var(--ink2); border: 1px solid var(--line); border-radius: 18px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+  color: inherit; font: inherit; cursor: pointer; text-align: center;
+}
+.an-tarjeta-t { font-size: 14.5px; font-weight: 600; min-height: 2.6em; display: flex; align-items: center; justify-content: center; line-height: 1.3; }
+.an-tarjeta .ficha-tablero { border-radius: 10px; }
+.an-tarjeta-pie { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+
+.an-det-cab { gap: 8px; }
+.an-rango { gap: 14px; }
+.an-rango-n { font-size: 22px; font-weight: 600; }
+.an-rango-n.apagado { color: var(--muted); }
+.an-escudo {
+  width: 40px; height: 40px; flex: none; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700;
+  background: var(--ink3); color: var(--muted);
+}
+.an-escudo.activo { background: linear-gradient(135deg, #f07a1a, #d8263a); color: #fff; }
+
+.an-pestanas { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+.an-pestanas button {
+  background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 4px;
+  color: var(--muted); font: inherit; font-size: 15px; cursor: pointer;
+}
+.an-pestanas button[aria-selected="true"] { color: var(--paper); border-bottom-color: var(--paper); font-weight: 600; }
+.an-tarjeta-pie .s { white-space: nowrap; }
+.an-tarjeta-rango {
+  font-size: 12px; font-weight: 600; color: var(--brass);
+  text-transform: uppercase; letter-spacing: .06em; margin-top: -4px;
+}
+
+/* Tableros pequeños: filas FIJAS. Sin esto, en Chrome de Android una fila sin
+   piezas no tiene contenido que le dé alto y se aplasta a una tira: la
+   posicion parecia tener los peones una fila mas arriba. */
+.ficha-tablero { grid-template-rows: repeat(8, 1fr); }
+.ficha-tablero .casilla { aspect-ratio: 1; }
+
+.an-chips-fila { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.an-chips-fila:empty { display: none; }
+.an-tipo { margin-bottom: 8px; }
+
+/* El tablero vive DENTRO de la pestaña Cursos, no en una pantalla aparte: los
+   bloques que vienen del explorador traen su propio margen lateral y aquí
+   sobra, porque el panel ya tiene el suyo. */
+#cursos-tablero .rotulo { margin-left: 0; margin-right: 0; }
+#cursos-tablero .linea-jugadas,
+#cursos-tablero .controles { padding-inline: 0; }
+#cursos-tablero > .cabeza-fija { margin-inline: -2px; }
+#cursos-tablero [id$="-eval"],
+#cursos-tablero [id="bp-mios"],
+
+
+/* ===========================================================================
+   APRENDER POR VARIANTES (Fase 29) — lineas.js
+   =========================================================================== */
+/* Flechas y casillas marcadas del PGN, sobre cualquier tablero que las pida. */
+.tablero-flechas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 5;
+}
+.marca-pgn {
+  position: absolute; inset: 5%; z-index: 2; border-radius: 50%;
+  border: 4px solid; pointer-events: none;
+}
+.marca-pgn.marca-G { border-color: rgba(21,120,27,.8); }
+.marca-pgn.marca-R { border-color: rgba(200,30,40,.8); }
+.marca-pgn.marca-Y { border-color: rgba(230,150,0,.85); }
+.marca-pgn.marca-B { border-color: rgba(40,90,220,.8); }
+
+.lin-vista { padding: 14px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+#lin-sesion { padding: 0; gap: 0; }
+.lin-pestanas { grid-template-columns: repeat(3, 1fr); }
+
+/* Fase 30: calendario de variantes y ajustes del curso */
+.lin-cal { display: flex; flex-direction: column; gap: 6px; }
+.lin-cal-dia {
+  display: grid; grid-template-columns: 64px 1fr 28px; align-items: center; column-gap: 10px; row-gap: 3px;
+  width: 100%; text-align: left; color: inherit; background: var(--ink2); border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 9px 12px; font: inherit; cursor: pointer;
+}
+.lin-cal-dia.hoy { border-color: var(--brass); }
+.lin-cal-dia.vacio-dia { cursor: default; opacity: .55; padding-top: 6px; padding-bottom: 6px; }
+.lin-cal-f { font-size: 13px; font-weight: 650; }
+.lin-cal-b { height: 8px; background: var(--ink3); border-radius: 4px; overflow: hidden; }
+.lin-cal-b i { display: block; height: 100%; background: var(--brass); border-radius: 4px; }
+.lin-cal-n { font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.lin-cal-l { grid-column: 1 / -1; font-size: 12px; color: var(--muted); line-height: 1.35;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lin-ajustes { display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.4; }
+.lin-ajustes label { gap: 10px; cursor: pointer; align-items: flex-start; }
+.lin-ajustes input { width: 18px; height: 18px; flex: none; margin: 1px 0 0; }
+.lin-ajustes .apagado { color: var(--muted); }
+
+/* La ruta: un camino de nodos redondos que serpentea, como las lecciones de
+   Lotuschess o Duolingo. Cada nodo es una variante. */
+.lin-seccion {
+  background: linear-gradient(100deg, #7b3fe4 0%, #dc2a4b 55%, #f0761d 100%);
+  color: #fff; border-radius: var(--r); padding: 14px 16px; margin-top: 6px;
+}
+.lin-seccion small { opacity: .85; font-size: 12px; }
+.lin-seccion b { display: block; font-size: 17px; font-weight: 650; }
+.lin-ruta { padding: 30px 0 8px; overflow: hidden; }
+.lin-nodo {
+  display: block; width: 66px; height: 66px; border-radius: 50%; border: 0;
+  margin: 12px auto; position: relative; cursor: pointer;
+  background: var(--ink3); color: var(--muted); font-size: 24px;
+  box-shadow: 0 5px 0 rgba(0,0,0,.25);
+}
+.lin-nodo.visto    { background: #c43b8a; color: #fff; }
+.lin-nodo.dominado { background: #3f9f4a; color: #fff; }
+.lin-nodo.toca {
+  background: linear-gradient(135deg, #f07a1a, #d8263a); color: #fff;
+  box-shadow: 0 0 0 6px var(--ink), 0 0 0 9px #dc2a4b;
+}
+.lin-globo {
+  position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+  background: var(--ink2); color: #ff6a84; border: 1px solid var(--line);
+  font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 10px; white-space: nowrap;
+}
+.lin-nom {
+  position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+  width: 130px; text-align: left; font-size: 12px; line-height: 1.3; color: var(--muted);
+}
+
+.lin-acciones {
+  position: sticky; bottom: 0; display: flex; gap: 10px; margin: 4px -16px 0;
+  padding: 18px 16px max(14px, env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, transparent, var(--ink) 35%);
+}
+.lin-acciones .btn { flex: 1; color: #fff; border: 0; font-weight: 600; }
+.lin-dominio { background: linear-gradient(100deg, #dc2a4b, #f0761d); }
+.lin-nuevas  { background: linear-gradient(100deg, #7b3fe4, #c0307a); }
+.lin-estado.hoy { background: var(--mal-fondo); color: var(--mal-texto); }
+.lin-estado.aprendiendo { background: var(--pista-fondo); color: var(--pista-texto); }
+
+/* La sesion */
+.lin-progreso { height: 4px; background: var(--ink3); }
+.lin-progreso i { display: block; height: 100%; width: 0; background: var(--brass); transition: width .3s; }
+.lin-com {
+  min-height: 46px; padding: 10px 16px; font-size: 14px; line-height: 1.45; color: var(--muted);
+}
+.lin-com .j { color: var(--paper); font-weight: 650; }
+.lin-enlace {
+  color: var(--brass); font-weight: 600; cursor: pointer;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.lin-viendo {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  padding: 8px 16px; background: var(--azul); color: #fff; font-size: 14px;
+}
+.lin-viendo button {
+  background: #fff; color: var(--azul); border: 0; border-radius: 8px;
+  padding: 4px 10px; font-weight: 700; font: inherit; font-weight: 700;
+}
+.lin-cuadros { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.lin-cuadros i {
+  width: 20px; height: 20px; border-radius: 5px; background: var(--ink3);
+  border: 2px solid transparent;
+}
+.lin-cuadros i.hecho { background: var(--ok-texto); }
+.lin-cuadros i.error { background: var(--mal-texto); }
+.lin-cuadros i.pista { background: var(--pista-texto); }
+.lin-cuadros i.auto { background: var(--ok-texto); opacity: .35; }
+.lin-cuadros i.antes { border-color: var(--pista-texto); }
+.lin-cuadros i.ahora { outline: 2px solid var(--paper); outline-offset: 1px; }
+.lin-lupa { width: 54px; flex: none; font-size: 20px; padding: 10px 0; }
+.lin-linea { font-size: 14px; line-height: 1.9; word-break: break-word; }
+.lin-linea .t { display: block; color: var(--muted); font-size: 12px; margin-bottom: 2px; }
+.lin-mv {
+  padding: 1px 5px; border-radius: 6px; border: 0; background: none;
+  font: inherit; font-weight: 600; color: var(--paper); cursor: pointer;
+}
+.lin-mv.rival { color: var(--muted); }
+.lin-mv.act { background: var(--azul); color: #fff; }
+.lin-nota { color: var(--muted); font-style: italic; font-size: 13px; }
+.lin-num { color: var(--muted); font-size: 13px; }
+
+/* El resumen: los cuatro contadores de Lotuschess */
+.lin-contadores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+.lin-contadores div { border-radius: var(--r-s); padding: 10px 2px; text-align: center; color: #fff; }
+.lin-contadores small { display: block; font-size: 10.5px; font-weight: 700; opacity: .95; }
+.lin-contadores b { font-size: 22px; }
+.lin-contadores .c-hacer { background: #3d8cf0; }
+.lin-contadores .c-error { background: #d95a6a; }
+.lin-contadores .c-duda  { background: #d9932c; }
+.lin-contadores .c-ok    { background: #4fa85f; }
+
+/* ---------------------------------------------------------------------------
+   Fase 37 — a ciegas con voz
+   --------------------------------------------------------------------------- */
+#ent-voz.activo, #bl-voz.activo { color: var(--brass); }
+.ent-oido { color: var(--muted); font-size: 13px; min-height: 1.4em; }
+/* Hard (Fase 38): la posicion en coordenadas, bajo el tablero vacio. */
+.coords {
+  margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--ink2); white-space: pre-wrap; word-break: break-word;
+  font-family: var(--mono, ui-monospace, monospace); font-size: 13.5px; line-height: 1.7;
+}
+.candado {
+  position: fixed; inset: 0; z-index: 60;
+  background: #050505; color: #d8d2c4;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  text-align: center; touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.candado.oculto { display: none; }
+.candado-icono { font-size: 44px; opacity: .8; }
+.candado-txt { margin: 0; font-size: 20px; line-height: 1.5; max-width: 34ch; max-height: 50vh; overflow: hidden; }
+.candado-oido { margin: 0; font-size: 15px; color: #8d8778; min-height: 1.4em; }
+.candado-pista { margin: 24px 0 0; font-size: 13px; color: #6f6a5f; }
+.candado-barra { width: 160px; height: 4px; border-radius: 2px; background: #222; overflow: hidden; }
+.candado-barra i { display: block; height: 100%; width: 0; background: var(--brass); }
+.candado.apretando .candado-barra i { width: 100%; transition: width 1s linear; }
+#bl-linea { line-height: 1.7; word-break: break-word; }
+#bl-linea .ciega-corte { color: var(--brass); font-size: 11px; vertical-align: 1px; }
+
+/* La chuleta de la voz (Fase 38). */
+.guia-voz { border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px; font-size: 13.5px; }
+.guia-voz.oculto { display: none; }
+.guia-voz summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+.guia-voz dl { margin: 8px 0 2px; display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; }
+.guia-voz dt { font-weight: 600; }
+.guia-voz dd { margin: 0; color: var(--muted); line-height: 1.5; }

@@ -1,0 +1,17 @@
+{
+  "name": "openingchessai",
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute xaketegi --file=schema.sql --local",
+    "db:remote": "wrangler d1 execute xaketegi --file=schema.sql --remote",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

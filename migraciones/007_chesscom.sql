@@ -1,0 +1,21 @@
+-- ===========================================================================
+-- 007 — La cuenta de Chess.com del usuario.
+--
+-- Va en `users` y NO en una tabla de "cuentas vinculadas" con una fila por
+-- plataforma, que seria lo bonito. Razon: son dos columnas en total (Lichess
+-- ya esta ahi desde el principio) y una tabla aparte obligaria a un JOIN en
+-- `sesion()`, que se ejecuta en CADA peticion de la app. Con 5 millones de
+-- lecturas al dia en el plan Free, duplicar la consulta de sesion es el gasto
+-- mas caro que se puede elegir.
+--
+-- A DIFERENCIA DE `fide_id`, aqui NO hay `origen`. La ficha FIDE distingue
+-- «confirmada por Lichess» de «declarada por ti» porque con ella se promocionan
+-- partidas cedidas a la base comun: hace falta un respaldo de tercero. El
+-- usuario de Chess.com no promociona nada —solo sirve para rellenar un
+-- formulario y, mas adelante, para cruzar tus propias partidas contra tu
+-- repertorio—, asi que declararlo a mano basta y no hay nada que suplantar.
+--
+--   npx wrangler d1 execute xaketegi --file=migraciones/007_chesscom.sql --remote
+-- ===========================================================================
+
+ALTER TABLE users ADD COLUMN chesscom TEXT;

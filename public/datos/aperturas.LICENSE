@@ -1,0 +1,11 @@
+Nombres de apertura y codigos ECO derivados de:
+  https://github.com/lichess-org/chess-openings  (dominio publico, CC0)
+
+El fichero aperturas.json se genera reproduciendo la columna `pgn` de ese
+conjunto de datos con chess.js y quedandose con el EPD resultante, de modo que
+el EPD que calcula la app y el de la tabla se obtienen igual y coinciden.
+Formato: { "<EPD>": "<ECO>|<nombre>" }.
+
+El fichero aperturas-lineas.json (Fase 35b) son esas mismas lineas tal cual:
+[eco, nombre, jugadas en SAN separadas por espacios], para que el asistente
+sepa que «la Tarrasch» es 1.e4 e6 2.d4 d5 3.Nd2.

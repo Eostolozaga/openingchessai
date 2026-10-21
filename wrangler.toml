@@ -1,0 +1,60 @@
+name = "xaketegi"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+# La PWA y la API salen del MISMO Worker y por tanto del mismo origen: no hay
+# CORS que configurar ni preflights que pagar, y la cookie de sesion viaja sola.
+#
+# Se usa Worker con static assets en vez de Pages porque Pages Functions no
+# soporta Cron Triggers, y hace falta uno para la sugerencia diaria de Inicio.
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+# "none" a proposito: asi lo que no es un fichero cae en el Worker, que decide.
+# Con "single-page-application" el asset server devolveria index.html tambien
+# para /api/*, y la API dejaria de existir.
+not_found_handling = "none"
+# Sin reescrituras del asset server: una ruta como /rival/magnus tiene que
+# llegar al Worker y servir index.html CONSERVANDO la URL. Con el valor por
+# defecto el asset server responde un 307 a "/" y la ruta se pierde.
+html_handling = "none"
+run_worker_first = ["/api/*"]
+
+# --- Dominio -----------------------------------------------------------------
+# Cambia el patron por tu propio dominio (o quita el bloque y usa workers.dev).
+[[routes]]
+pattern = "app.openingchessai.com"
+custom_domain = true
+
+# --- Bindings ----------------------------------------------------------------
+[[d1_databases]]
+binding = "DB"
+database_name = "xaketegi"
+database_id = "PON_AQUI_EL_ID"   # npx wrangler d1 create <nombre> te lo da
+
+# Artefactos publicos precalculados (.json.gz). El bucket NO es publico: se
+# sirve por /api/art/* exigiendo sesion, y se cachea en el edge.
+[[r2_buckets]]
+binding = "ART"
+bucket_name = "xaketegi-artefactos"
+
+# PGN privados de cada usuario. Nunca se sirven a nadie mas.
+[[r2_buckets]]
+binding = "PGN"
+bucket_name = "xaketegi-pgn"
+
+# --- Cron --------------------------------------------------------------------
+# 05:00 UTC = 07:00 en horario peninsular de verano. La sugerencia del dia esta
+# calculada antes de que nadie abra la app.
+[triggers]
+crons = ["0 5 * * *"]
+
+[observability]
+enabled = true
+
+# Fase 35: Workers AI para el asistente (/api/chat). Solo entiende la pregunta;
+# las cifras las calcula el movil.
+[ai]
+binding = "AI"
