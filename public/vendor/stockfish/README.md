@@ -1,13 +1,13 @@
 # Stockfish.js
 
-`stockfish-19-lite-single.js` y `stockfish-19-lite-single.wasm` son la build
-*lite single-threaded* de **Stockfish.js 19**, sin modificar, de
-<https://github.com/nmrugg/stockfish.js>, basada en
+`stockfish-19-lite-single.js` and `stockfish-19-lite-single.wasm` are the
+unmodified *lite single-threaded* build of **Stockfish.js 19**, from
+<https://github.com/nmrugg/stockfish.js>, based on
 [Stockfish](https://github.com/official-stockfish/Stockfish).
 
-Se distribuye bajo la **GNU General Public License v3** (texto completo en
-[`COPYING`](COPYING)). El código fuente correspondiente está disponible en los
-repositorios enlazados arriba.
+They are distributed under the **GNU General Public License v3** (full text in
+[`COPYING`](COPYING)). The corresponding source code is available in the
+repositories linked above.
 
-El aviso de derechos reservados del resto del repositorio (`LICENSE`) **no** se
-aplica a esta carpeta.
+The all-rights-reserved notice for the rest of this repository (`LICENSE`)
+does **not** apply to this folder.
